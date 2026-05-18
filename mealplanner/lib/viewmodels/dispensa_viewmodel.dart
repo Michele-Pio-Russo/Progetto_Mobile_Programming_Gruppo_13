@@ -28,13 +28,13 @@ class GestoreDispensa extends ChangeNotifier {
     notifyListeners();
   }
 
-  // 3. Metodo per rimuovere un articolo
+  // Metodo per rimuovere un articolo
   void rimuoviArticolo(String id) {
     _articoli.removeWhere((articolo) => articolo.id == id);
     notifyListeners();
   }
 
-  // 4. Metodo per aggiornare la quantità
+  // Metodo per aggiornare la quantità
   void aggiornaQuantita(String id, double nuovaQuantita) {
     final indice = _articoli.indexWhere((articolo) => articolo.id == id);
     
@@ -52,7 +52,7 @@ class GestoreDispensa extends ChangeNotifier {
     }
   }
 
-  // 5. Metodo per modificare un articolo
+  // Metodo per modificare un articolo
   void modificaArticoloCompleto(Dispensa articoloModificato) {
     final indice = _articoli.indexWhere((articolo) => articolo.id == articoloModificato.id);
     
