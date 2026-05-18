@@ -1,9 +1,11 @@
 class pianoPasti {
+  // attributi classe piano pasti
   final String id;
-  final String dayOfWeek; // Es. "Lunedì"
-  final String mealType;  // Es. "Pranzo" o "Cena"
-  final String recipeId;  // Il collegamento rapido alla ricetta richiesto dall'SRS
+  final String dayOfWeek; 
+  final String mealType; 
+  final String recipeId;  
 
+  // construttore
   pianoPasti({
     required this.id,
     required this.dayOfWeek,
