@@ -1,12 +1,12 @@
 class Ricette {
-  // attributi classe ricetta
+  // Attributi classe ricetta
   final String id;
   final String titolo;
   final String descrizione;
   final List<String> ingredienti;
   final String categoria; 
 
-  // costruttore
+  // Costruttore
   Ricette({
     required this.id,
     required this.titolo,
