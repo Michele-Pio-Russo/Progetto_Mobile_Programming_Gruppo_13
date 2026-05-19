@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../models/piano_pasti.dart';
+import '../models/piano_pasti_model.dart';
 
 class PianoPastiViewModel extends ChangeNotifier{ // Con ChangeNotifier, possiamo avvisare la grafica quando i dati cambiano
   

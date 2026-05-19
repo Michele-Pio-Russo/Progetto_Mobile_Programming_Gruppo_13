@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 // Usiamo gli import di pacchetto esplicitando 'mealplanner'
-import 'package:mealplanner/views/piano_pasti_view.dart';
+import 'package:mealplanner/views/piano%20pasti/piano_pasti_view.dart';
 import 'package:mealplanner/viewmodels/piano_pasti_viewmodel.dart';
 
 void main() {

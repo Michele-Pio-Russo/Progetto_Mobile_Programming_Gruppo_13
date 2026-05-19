@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../models/dispensa.dart'; 
+import '../models/dispensa_model.dart'; 
 
 class GestoreDispensa extends ChangeNotifier {
   // La lista privata che contiene tutti gli articoli presenti in dispensa
