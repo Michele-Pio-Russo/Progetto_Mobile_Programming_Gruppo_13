@@ -12,7 +12,8 @@ class SchermataDispensa extends StatefulWidget {
 }
 
 class _SchermataDispensaState extends State<SchermataDispensa> {
-  String filtroAttuale = 'Tutti'; // Gestisce i tre bottoni in alto del wireframe
+  String filtroAttuale = 'Tutti'; // Gestisce i tre bottoni
+  String _categoriaSelezionata = 'Tutte'; // 'Tutte' è il valore di default
 
   @override
   Widget build(BuildContext context) {
@@ -24,6 +25,9 @@ class _SchermataDispensaState extends State<SchermataDispensa> {
       articoliFiltrati = gestore.articoli.where((a) => a.scadenza != null && a.statoCritico && a.quantita > 0).toList();
     } else if (filtroAttuale == 'In esaurimento') {
       articoliFiltrati = gestore.articoli.where((a) => a.quantita <= 0).toList();
+    }
+    if (_categoriaSelezionata != 'Tutte') {
+      articoliFiltrati = articoliFiltrati.where((a) => a.categoria == _categoriaSelezionata).toList();
     }
 
     return Scaffold(
@@ -49,13 +53,42 @@ class _SchermataDispensaState extends State<SchermataDispensa> {
           // Barra di Ricerca per i prodotti della dispensa
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-            child: TextField(
-              decoration: InputDecoration(
-                hintText: 'Cerca prodotto...',
-                prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                contentPadding: const EdgeInsets.symmetric(vertical: 0),
-              ),
+            child: Row(
+              children: [
+                Expanded(
+                  flex: 2,
+                  child: TextField(
+                    decoration: InputDecoration(
+                      hintText: 'Cerca...',
+                      prefixIcon: const Icon(Icons.search),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                      contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  flex: 1,
+                  child: DropdownButtonFormField<String>(
+                    initialValue: _categoriaSelezionata,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 10),
+                    ),
+                    items: ['Tutte', ...Dispensa.categorie].map((String cat) {
+                      return DropdownMenuItem<String>(
+                        value: cat,
+                        child: Text(cat, overflow: TextOverflow.ellipsis),
+                      );
+                    }).toList(),
+                    onChanged: (nuovoValore) {
+                      setState(() {
+                        _categoriaSelezionata = nuovoValore!;
+                      });
+                    },
+                  ),
+                ),
+              ],
             ),
           ),
 
@@ -63,7 +96,7 @@ class _SchermataDispensaState extends State<SchermataDispensa> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             child: Row(
-              mainAxisAlignment: MainPageRoute = MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 _costruisciBottoneFiltro('Tutti'),
                 _costruisciBottoneFiltro('In scadenza'),

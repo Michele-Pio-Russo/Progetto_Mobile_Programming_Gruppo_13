@@ -13,10 +13,11 @@ class _SchermataPrincipaleState extends State<SchermataPrincipale> {
 
   // Elenco delle schermate collegate ai bottoni in basso
   final List<Widget> _pagine = [
-    const Center(child: Text('Schermata Ricette (Da implementare)')),     // Indice 0
-    const SchermataDispensa(),                                            // Indice 1 (La tua dispensa)
+    const Center(child: Text('Schermata Ricette (Da implementare)')),      // Indice 0
+    const SchermataDispensa(),                                             // Indice 1
     const Center(child: Text('Schermata Piano Pasti (Da implementare)')),  // Indice 2
     const Center(child: Text('Schermata Lista Spesa (Da implementare)')),  // Indice 3
+    const Center(child: Text('Schermata Statistiche (Da implementare)')),  // Indice 4
   ];
 
   @override
@@ -53,6 +54,10 @@ class _SchermataPrincipaleState extends State<SchermataPrincipale> {
           BottomNavigationBarItem(
             icon: Icon(Icons.shopping_cart),
             label: 'Spesa',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.bar_chart),
+            label: 'Statistiche',
           ),
         ],
       ),

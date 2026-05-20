@@ -1,32 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-// Usiamo gli import di pacchetto esplicitando 'mealplanner'
-import 'package:mealplanner/views/piano%20pasti/piano_pasti_view.dart';
-import 'package:mealplanner/viewmodels/piano_pasti_viewmodel.dart';
+import '../viewmodels/dispensa_viewmodel.dart';
+import '../views/navigazione_view.dart';
 
 void main() {
   runApp(
     ChangeNotifierProvider(
-      create: (context) => PianoPastiViewModel(),
-      child: const MyApp(),
+      create: (context) => GestoreDispensa(),
+      child: const MiaAppDispensa(),
     ),
   );
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class MiaAppDispensa extends StatelessWidget {
+  const MiaAppDispensa({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Meal Planner',
-      debugShowCheckedModeBanner: false,
+      title: 'Gestione Dispensa',
+      debugShowCheckedModeBanner: false, // Rimuove la scritta "Sotto esame/Debug" in alto a destra
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
-        useMaterial3: true,
+        primarySwatch: Colors.grey,
+        scaffoldBackgroundColor: Colors.white,
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.white,
+          elevation: 0,
+          titleTextStyle: TextStyle(
+            color: Colors.black,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+          iconTheme: IconThemeData(color: Colors.black),
+        ),
       ),
-      home: const PianoPastiView(),
+      home: const SchermataPrincipale(),
     );
   }
 }
