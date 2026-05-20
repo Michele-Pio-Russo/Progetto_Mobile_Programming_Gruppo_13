@@ -7,13 +7,13 @@ void main() {
   runApp(
     ChangeNotifierProvider(
       create: (context) => GestoreDispensa(),
-      child: const MiaAppDispensa(),
+      child: const MyApp(),
     ),
   );
 }
 
-class MiaAppDispensa extends StatelessWidget {
-  const MiaAppDispensa({super.key});
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
