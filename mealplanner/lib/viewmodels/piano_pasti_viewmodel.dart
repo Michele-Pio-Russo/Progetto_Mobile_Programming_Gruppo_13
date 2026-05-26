@@ -64,7 +64,7 @@ class PianoPastiViewModel extends ChangeNotifier{ // Con ChangeNotifier, possiam
     final index = _pasti.indexWhere((pasto) => pasto.id == id);
 
     // Se esiste, lo sovrascrive (caso di modifica)
-    if (index != -1) { // indexWhere se non trova nulla restituisce -1
+    if (index != -1) { // indexWhere se non trova nulla restituisce -1  
       _pasti[index] = PianoPasti(id: id, giorno: giorno, tipologia: tipologia, nomeRicetta: nomeRicetta, idRicetta: idRicetta); // Manteniamo l'idRicetta, così da non perdere il collegamento con la ricetta
     // Altrimenti, lo aggiunge al piano pasti (caso di aggiunta)
     } else {

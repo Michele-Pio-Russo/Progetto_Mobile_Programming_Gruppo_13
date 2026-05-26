@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../views/dispensa/dispensa_view.dart';
+import 'dispensa/dispensa_view.dart';
+import 'piano_pasti/piano_pasti_view.dart';
 
 class SchermataPrincipale extends StatefulWidget {
   const SchermataPrincipale({super.key});
@@ -15,7 +16,7 @@ class _SchermataPrincipaleState extends State<SchermataPrincipale> {
   final List<Widget> _pagine = [
     const Center(child: Text('Schermata Ricette (Da implementare)')),      // Indice 0
     const SchermataDispensa(),                                             // Indice 1
-    const Center(child: Text('Schermata Piano Pasti (Da implementare)')),  // Indice 2
+    const PianoPastiView(),                                          // Indice 2
     const Center(child: Text('Schermata Lista Spesa (Da implementare)')),  // Indice 3
     const Center(child: Text('Schermata Statistiche (Da implementare)')),  // Indice 4
   ];

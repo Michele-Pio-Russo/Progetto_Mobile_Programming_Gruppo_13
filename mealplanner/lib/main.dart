@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'viewmodels/piano_pasti_viewmodel.dart';
 import '../viewmodels/dispensa_viewmodel.dart';
 import '../views/navigazione_view.dart';
 
 void main() {
   runApp(
-    ChangeNotifierProvider(
-      create: (context) => GestoreDispensa(),
-      child: const MyApp(),
+     MultiProvider( // Serve a caricare tutti i viewmodels dell'app
+      providers: [
+        ChangeNotifierProvider(create: (context) => GestoreDispensa()), // Il provider per la gestione della dispensa
+        ChangeNotifierProvider(create: (context) => PianoPastiViewModel()), // Il provider per la gestione del piano pasti
+      ],
+      child: const MyApp(), 
     ),
   );
 }
