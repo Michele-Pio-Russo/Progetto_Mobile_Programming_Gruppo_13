@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 import '../../viewmodels/lista_spesa_viewmodel.dart';
 import '../../viewmodels/piano_pasti_viewmodel.dart';
@@ -7,8 +9,22 @@ import '../../viewmodels/ricette_viewmodel.dart';
 import '../../viewmodels/dispensa_viewmodel.dart'; 
 import 'lista_spesa_aggiunta_view.dart';
 
-class ListaSpesaView extends StatelessWidget {
+class ListaSpesaView extends StatefulWidget {
   const ListaSpesaView({super.key});
+
+  @override
+  State<ListaSpesaView> createState() => _ListaSpesaViewState();
+}
+
+class _ListaSpesaViewState extends State<ListaSpesaView> {
+  late DateTime _dataSelezionata;
+
+  @override
+  void initState() {
+    super.initState();
+    initializeDateFormatting('it_IT', null);
+    _dataSelezionata = DateTime.now();
+  }
 
   void _mostraDialogConferma(BuildContext context, ListaSpesaViewModel viewModel) {
     showDialog(
@@ -36,12 +52,15 @@ class ListaSpesaView extends StatelessWidget {
   }
 
   void _mostraDialogConfermaGenerazione(BuildContext context) {
+    final giorniSettimana = ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica'];
+    final giornoNome = giorniSettimana[_dataSelezionata.weekday - 1];
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Genera da Piano Pasti'),
-          content: const Text('Vuoi generare gli articoli mancanti confrontando le ricette di oggi con la tua dispensa?'),
+          content: Text('Vuoi generare gli articoli mancanti confrontando le ricette di $giornoNome con la tua dispensa?'),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
@@ -54,17 +73,14 @@ class ListaSpesaView extends StatelessWidget {
                 final dispensaVM = Provider.of<GestoreDispensa>(context, listen: false);
                 final listaSpesaVM = Provider.of<ListaSpesaViewModel>(context, listen: false);
 
-                final giorniSettimana = ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica'];
-                final giornoOggi = giorniSettimana[DateTime.now().weekday - 1];
-
-                final pastiOggi = pianoPastiVM.pasti.where((p) => p.giorno == giornoOggi).toList();
+                final pastiOggi = pianoPastiVM.pasti.where((p) => p.giorno == giornoNome).toList();
 
                 listaSpesaVM.generaDaPianoPasti(pastiOggi, ricetteVM, dispensaVM.articoli);
 
                 Navigator.pop(context);
 
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Lista aggiornata con gli ingredienti di oggi mancanti!')),
+                  SnackBar(content: Text('Lista aggiornata con gli ingredienti di $giornoNome mancanti!')),
                 );
               },
               child: const Text('Genera', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
@@ -82,13 +98,38 @@ class ListaSpesaView extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        title: const Text(
-          'Lista della Spesa',
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Lista della Spesa',
+              style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+            ),
+            Text(
+              DateFormat('EEEE d MMMM yyyy', 'it_IT').format(_dataSelezionata),
+              style: const TextStyle(fontSize: 12, color: Colors.grey, fontWeight: FontWeight.w500),
+            ),
+          ],
         ),
         centerTitle: false,
         iconTheme: const IconThemeData(color: Colors.black),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.calendar_today_outlined, color: Colors.black),
+            onPressed: () async {
+              DateTime? scelta = await showDatePicker(
+                context: context,
+                initialDate: _dataSelezionata,
+                firstDate: DateTime(2020),
+                lastDate: DateTime(2030),
+              );
+              if (scelta != null) {
+                setState(() {
+                  _dataSelezionata = scelta;
+                });
+              }
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.bolt, color: Colors.black),
             onPressed: () => _mostraDialogConfermaGenerazione(context),

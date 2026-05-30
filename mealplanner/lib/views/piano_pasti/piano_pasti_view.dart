@@ -1,14 +1,42 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 import '../../viewmodels/piano_pasti_viewmodel.dart';
 import '../../models/piano_pasti_model.dart';
 import 'piano_pasti_modifica_view.dart';
+
 import '../ricette/ricette_dettaglio_view.dart';
 import '../../models/ricette_model.dart';
 
-class PianoPastiView extends StatelessWidget {
+class PianoPastiView extends StatefulWidget {
   const PianoPastiView({super.key});
+
+  @override
+  State<PianoPastiView> createState() => _PianoPastiViewState();
+}
+
+class _PianoPastiViewState extends State<PianoPastiView> {
+  late DateTime _inizioSettimana;
+
+  @override
+  void initState() {
+    super.initState();
+    initializeDateFormatting('it_IT', null);
+    DateTime ora = DateTime.now();
+    _inizioSettimana = ora.subtract(Duration(days: ora.weekday - 1));
+    _inizioSettimana = DateTime(_inizioSettimana.year, _inizioSettimana.month, _inizioSettimana.day);
+  }
+
+  String _ottieniTestoIntervallo() {
+    DateTime fineSettimana = _inizioSettimana.add(const Duration(days: 6));
+    if (_inizioSettimana.month == fineSettimana.month) {
+      return "${_inizioSettimana.day} - ${DateFormat('d MMMM', 'it_IT').format(fineSettimana)}";
+    } else {
+      return "${DateFormat('d MMMM', 'it_IT').format(_inizioSettimana)} - ${DateFormat('d MMMM', 'it_IT').format(fineSettimana)}";
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +54,19 @@ class PianoPastiView extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.calendar_today_outlined),
-            onPressed: () {},
+            onPressed: () async {
+              DateTime? scelta = await showDatePicker(
+                context: context,
+                initialDate: _inizioSettimana,
+                firstDate: DateTime(2020),
+                lastDate: DateTime(2030),
+              );
+              if (scelta != null) {
+                setState(() {
+                  _inizioSettimana = scelta.subtract(Duration(days: scelta.weekday - 1));
+                });
+              }
+            },
           ),
         ],
       ),
@@ -44,18 +84,26 @@ class PianoPastiView extends StatelessWidget {
                   children: [
                     IconButton(
                       icon: const Icon(Icons.chevron_left),
-                      onPressed: () {},
+                      onPressed: () {
+                        setState(() {
+                          _inizioSettimana = _inizioSettimana.subtract(const Duration(days: 7));
+                        });
+                      },
                     ),
-                    const Text(
-                      '20 - 26 Maggio',
-                      style: TextStyle(
+                    Text(
+                      _ottieniTestoIntervallo(),
+                      style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     IconButton(
                       icon: const Icon(Icons.chevron_right),
-                      onPressed: () {},
+                      onPressed: () {
+                        setState(() {
+                          _inizioSettimana = _inizioSettimana.add(const Duration(days: 7));
+                        });
+                      },
                     ),
                   ],
                 ),
@@ -65,6 +113,8 @@ class PianoPastiView extends StatelessWidget {
                   itemCount: 7,
                   itemBuilder: (context, index) {
                     String giornoCorrente = PianoPasti.giorni[index];
+                    DateTime dataGiorno = _inizioSettimana.add(Duration(days: index));
+                    
                     var pastiDelGiorno = viewModel.pasti
                         .where((p) => p.giorno == giornoCorrente)
                         .toList();
@@ -88,7 +138,7 @@ class PianoPastiView extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  giornoCorrente,
+                                  "$giornoCorrente ${dataGiorno.day}",
                                   style: const TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
