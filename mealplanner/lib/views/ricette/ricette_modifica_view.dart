@@ -300,9 +300,15 @@ class _RicetteModificaViewState extends State<RicetteModificaView> {
                   decoration: const InputDecoration(
                     labelText: 'Tempo di preparazione* (minuti)',
                   ),
-                  validator: (valore) => (valore == null || valore.isEmpty)
-                      ? 'Inserisci il tempo di preparazione in minuti'
-                      : null,
+                  validator: (valore) {
+                    if (valore == null || valore.trim().isEmpty) {
+                      return 'Inserisci il tempo di preparazione in minuti';
+                    }
+                    if (int.tryParse(valore.trim()) == null) {
+                      return 'Deve essere un numero valido';
+                    }
+                    return null;
+                  },
                 ),
                 const SizedBox(height: 16),
 

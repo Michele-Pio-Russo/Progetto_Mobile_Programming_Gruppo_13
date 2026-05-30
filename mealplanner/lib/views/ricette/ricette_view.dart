@@ -222,31 +222,17 @@ class _RicetteViewState extends State<RicetteView> {
                                   ),
                                 ),
                               ),
-                              PopupMenuButton<String>(
-                                icon: const Icon(Icons.more_vert),
-                                onSelected: (value) {
-                                  // Navighiamo alla schermata di modifica solo se cliccano l'opzione
-                                  if (value == 'modifica') {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => RicetteModificaView(ricetta: ricetta),
-                                      ),
-                                    );
-                                  }
-                                },
-                                itemBuilder: (BuildContext context) => [
-                                  const PopupMenuItem(
-                                    value: 'modifica',
-                                    child: Row(
-                                      children: [
-                                        Icon(Icons.edit, size: 20),
-                                        SizedBox(width: 8),
-                                        Text('Modifica'),
-                                      ],
+                              IconButton(
+                                icon: const Icon(Icons.edit, color: Colors.blue),
+                                onPressed: () {
+                                  // Cliccando la matita navighiamo direttamente alla schermata di modifica
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => RicetteModificaView(ricetta: ricetta),
                                     ),
-                                  ),
-                                ],
+                                  );
+                                },
                               ),
                             ],
                           ),
