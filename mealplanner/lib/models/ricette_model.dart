@@ -2,15 +2,15 @@ class Ricette {
   // Attributi classe ricetta
   final String id;
   final String titolo;
-  final String descrizione;
+  final String preparazione;
   final List<String> ingredienti;
-  final String categoria; 
+  final String categoria;
 
   // Costruttore
   Ricette({
     required this.id,
     required this.titolo,
-    required this.descrizione,
+    required this.preparazione,
     required this.ingredienti,
     required this.categoria,
   });
@@ -34,7 +34,7 @@ class Ricette {
     return {
       'id': id,
       'titolo': titolo,
-      'descrizione': descrizione,
+      'preparazione': preparazione,
       'ingredienti': ingredienti,
       'categoria': categoria,
     };
@@ -45,7 +45,7 @@ class Ricette {
     return Ricette(
       id: json['id'],
       titolo: json['titolo'],
-      descrizione: json['descrizione'],
+      preparazione: json['preparazione'] ?? json['descrizione'],
       ingredienti: List<String>.from(json['ingredienti'] ?? []),
       categoria: json['categoria'] ?? 'Altro',
     );
@@ -55,14 +55,14 @@ class Ricette {
   Ricette copia({
     String? id,
     String? titolo,
-    String? descrizione,
+    String? preparazione,
     List<String>? ingredienti,
     String? categoria,
   }) {
     return Ricette(
       id: id ?? this.id,
       titolo: titolo ?? this.titolo,
-      descrizione: descrizione ?? this.descrizione,
+      preparazione: preparazione ?? this.preparazione,
       ingredienti: ingredienti ?? this.ingredienti,
       categoria: categoria ?? this.categoria,
     );

@@ -120,7 +120,7 @@ class _RicetteViewState extends State<RicetteView> {
                           ),
                           title: Text(ricetta.titolo, style: const TextStyle(fontWeight: FontWeight.bold)),
                           subtitle: Text(
-                            ricetta.descrizione,
+                            ricetta.preparazione,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(fontSize: 12),

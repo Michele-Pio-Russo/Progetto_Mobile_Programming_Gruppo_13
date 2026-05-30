@@ -22,63 +22,63 @@ class RicetteViewModel extends ChangeNotifier {
     Ricette(
       id: '1',
       titolo: 'Spaghetti alla Carbonara',
-      descrizione: 'Un classico della cucina romana preparato con guanciale croccante, tuorli d\'uovo freschi, pecorino romano e abbondante pepe nero.',
+      preparazione: 'Un classico della cucina romana preparato con guanciale croccante, tuorli d\'uovo freschi, pecorino romano e abbondante pepe nero.',
       ingredienti: ['Spaghetti', 'Guanciale', 'Tuorli d\'uovo', 'Pecorino Romano', 'Pepe nero'],
       categoria: 'Primo Piatto',
     ),
     Ricette(
       id: '2',
       titolo: 'Insalata Caesar',
-      descrizione: 'Un\'insalata fresca e saporita con pollo grigliato, crostini croccanti, scaglie di parmigiano e la classica salsa Caesar.',
+      preparazione: 'Un\'insalata fresca e saporita con pollo grigliato, crostini croccanti, scaglie di parmigiano e la classica salsa Caesar.',
       ingredienti: ['Lattuga', 'Petto di pollo', 'Crostini di pane', 'Parmigiano Reggiano', 'Salsa Caesar'],
       categoria: 'Piatto Unico',
     ),
     Ricette(
       id: '3',
       titolo: 'Toast e Caffè',
-      descrizione: 'Una colazione semplice e veloce, con toast caldo farcito con prosciutto e formaggio filante, accompagnato da un buon caffè.',
+      preparazione: 'Una colazione semplice e veloce, con toast caldo farcito con prosciutto e formaggio filante, accompagnato da un buon caffè.',
       ingredienti: ['Pane in cassetta', 'Prosciutto cotto', 'Formaggio a fette', 'Caffè'],
       categoria: 'Colazione',
     ),
     Ricette(
       id: '4',
       titolo: 'Burger di Manzo',
-      descrizione: 'Gustoso burger di manzo servito in pane morbido con formaggio cheddar fuso, lattuga fresca, pomodoro e salse a scelta.',
+      preparazione: 'Gustoso burger di manzo servito in pane morbido con formaggio cheddar fuso, lattuga fresca, pomodoro e salse a scelta.',
       ingredienti: ['Pane da hamburger', 'Svizzera di manzo', 'Lattuga', 'Pomodoro', 'Formaggio Cheddar', 'Ketchup', 'Maionese'],
       categoria: 'Secondo Piatto',
     ),
     Ricette(
       id: '5',
       titolo: 'Zuppa di Lenticchie',
-      descrizione: 'Una zuppa calda e nutriente preparata con lenticchie secche, un soffritto classico di verdure e brodo vegetale.',
+      preparazione: 'Una zuppa calda e nutriente preparata con lenticchie secche, un soffritto classico di verdure e brodo vegetale.',
       ingredienti: ['Lenticchie', 'Carote', 'Sedano', 'Cipolla', 'Brodo vegetale', 'Olio extravergine d\'oliva'],
       categoria: 'Piatto Unico',
     ),
     Ricette(
       id: '6',
       titolo: 'Yogurt con Frutta',
-      descrizione: 'Uno spuntino sano e fresco a base di yogurt greco cremoso, dolcificato con miele e guarnito con frutta fresca e granola.',
+      preparazione: 'Uno spuntino sano e fresco a base di yogurt greco cremoso, dolcificato con miele e guarnito con frutta fresca e granola.',
       ingredienti: ['Yogurt greco', 'Miele', 'Fragole', 'Mirtilli', 'Granola'],
       categoria: 'Spuntino',
     ),
     Ricette(
       id: '7',
       titolo: 'Frutta Secca',
-      descrizione: 'Un mix energetico e nutriente di frutta secca a guscio, ideale per una ricarica rapida durante la giornata.',
+      preparazione: 'Un mix energetico e nutriente di frutta secca a guscio, ideale per una ricarica rapida durante la giornata.',
       ingredienti: ['Mandorle', 'Noci', 'Nocciole', 'Anacardi'],
       categoria: 'Spuntino',
     ),
     Ricette(
       id: '8',
       titolo: 'Torta al Cioccolato',
-      descrizione: 'Una torta soffice e golosa ricca di cioccolato, perfetta per la colazione, la merenda o come dessert di fine pasto.',
+      preparazione: 'Una torta soffice e golosa ricca di cioccolato, perfetta per la colazione, la merenda o come dessert di fine pasto.',
       ingredienti: ['Farina', 'Zucchero', 'Cacao amaro', 'Burro', 'Uova', 'Lievito per dolci'],
       categoria: 'Dolce',
     ),
     Ricette(
       id: '9',
       titolo: 'Gelato alla Vaniglia',
-      descrizione: 'Un dessert classico e rinfrescante con gelato cremoso alla vaniglia, eventualmente guarnito con topping a scelta.',
+      preparazione: 'Un dessert classico e rinfrescante con gelato cremoso alla vaniglia, eventualmente guarnito con topping a scelta.',
       ingredienti: ['Gelato alla vaniglia', 'Cialda', 'Topping al cioccolato', 'Granella di nocciole'],
       categoria: 'Dolce',
     ),
@@ -146,7 +146,7 @@ class RicetteViewModel extends ChangeNotifier {
     return _ricette.where((r) => r.categoria == categoria).toList();
   }
 
-  // Cerca ricette tramite una parola chiave (ricerca nel titolo, nella descrizione o negli ingredienti)
+  // Cerca ricette tramite una parola chiave (ricerca nel titolo, nella preparazione o negli ingredienti)
   List<Ricette> cercaRicette(String query) {
     if (query.isEmpty) {
       return _ricette;
@@ -154,7 +154,7 @@ class RicetteViewModel extends ChangeNotifier {
     final q = query.toLowerCase();
     return _ricette.where((r) =>
         r.titolo.toLowerCase().contains(q) ||
-        r.descrizione.toLowerCase().contains(q) ||
+        r.preparazione.toLowerCase().contains(q) ||
         r.ingredienti.any((ing) => ing.toLowerCase().contains(q))
     ).toList();
   }
