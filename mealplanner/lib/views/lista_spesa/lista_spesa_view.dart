@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../viewmodels/lista_spesa_viewmodel.dart';
+import '../../viewmodels/piano_pasti_viewmodel.dart';
+import '../../viewmodels/ricette_viewmodel.dart';
+import '../../viewmodels/dispensa_viewmodel.dart'; 
 import 'lista_spesa_aggiunta_view.dart';
 
 class ListaSpesaView extends StatelessWidget {
@@ -32,6 +35,46 @@ class ListaSpesaView extends StatelessWidget {
     );
   }
 
+  void _mostraDialogConfermaGenerazione(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Genera da Piano Pasti'),
+          content: const Text('Vuoi generare gli articoli mancanti confrontando le ricette di oggi con la tua dispensa?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Annulla', style: TextStyle(color: Colors.grey)),
+            ),
+            TextButton(
+              onPressed: () {
+                final pianoPastiVM = Provider.of<PianoPastiViewModel>(context, listen: false);
+                final ricetteVM = Provider.of<RicetteViewModel>(context, listen: false);
+                final dispensaVM = Provider.of<GestoreDispensa>(context, listen: false);
+                final listaSpesaVM = Provider.of<ListaSpesaViewModel>(context, listen: false);
+
+                final giorniSettimana = ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica'];
+                final giornoOggi = giorniSettimana[DateTime.now().weekday - 1];
+
+                final pastiOggi = pianoPastiVM.pasti.where((p) => p.giorno == giornoOggi).toList();
+
+                listaSpesaVM.generaDaPianoPasti(pastiOggi, ricetteVM, dispensaVM.articoli);
+
+                Navigator.pop(context);
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Lista aggiornata con gli ingredienti di oggi mancanti!')),
+                );
+              },
+              child: const Text('Genera', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,6 +89,10 @@ class ListaSpesaView extends StatelessWidget {
         centerTitle: false,
         iconTheme: const IconThemeData(color: Colors.black),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.bolt, color: Colors.black),
+            onPressed: () => _mostraDialogConfermaGenerazione(context),
+          ),
           Consumer<ListaSpesaViewModel>(
             builder: (context, viewModel, child) {
               final haProdottiComprati = viewModel.prodotti.any((p) => p.comprato);
