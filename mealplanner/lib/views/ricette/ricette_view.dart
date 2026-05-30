@@ -137,6 +137,7 @@ class _RicetteViewState extends State<RicetteView> {
                     ...List.generate(5, (index) => DropdownMenuItem(
                       value: index + 1, 
                       child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center, // Centra le fiammelle all'interno della riga
                         children: List.generate(index + 1, (_) => const Icon(Icons.local_fire_department, color: Colors.orange, size: 16))
                       )
                     )),
