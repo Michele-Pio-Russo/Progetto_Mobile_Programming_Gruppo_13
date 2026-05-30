@@ -2,57 +2,47 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../viewmodels/piano_pasti_viewmodel.dart';
-import '../../models/piano_pasti_model.dart'; // Assicurati che questo nome file sia corretto!
+import '../../models/piano_pasti_model.dart';
+import 'piano_pasti_modifica_view.dart';
 
-class PianoPastiView extends StatelessWidget { 
+class PianoPastiView extends StatelessWidget {
   const PianoPastiView({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, // Sfondo bianco come nel wireframe
-      
-      // BARRA SUPERIORE
-      appBar: AppBar( 
+      backgroundColor: Colors.white,
+      appBar: AppBar(
         backgroundColor: Colors.white,
-        elevation: 0, // Rimuove l'ombra sotto la barra per un look più pulito
+        elevation: 0,
         title: const Text('Piano pasti', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
-        centerTitle: false, // Nel wireframe il titolo sembra spostato a sinistra (o centrato, dipende dal telefono)
+        centerTitle: false,
         iconTheme: const IconThemeData(color: Colors.black),
         actions: [
-
-          // L'icona del calendario in alto a destra
-          IconButton(
-            icon: const Icon(Icons.calendar_today_outlined),
-            onPressed: () {
-            },
-          ),
+          IconButton(icon: const Icon(Icons.calendar_today_outlined), onPressed: () {}),
         ],
       ),
-      
-      // IL PULSANTE (+)
       floatingActionButton: FloatingActionButton(
-        onPressed: () {        },
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const SchermataModificaPianoPasti()),
+          );
+        },
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
-        elevation: 2, // Ombra
-        shape: CircleBorder(side: BorderSide(color: Colors.grey.shade300)), // Bordo grigio
+        elevation: 2,
+        shape: CircleBorder(side: BorderSide(color: Colors.grey.shade300)),
         child: const Icon(Icons.add, size: 28),
       ),
-
-      // BODY
-      body: Consumer<PianoPastiViewModel>( 
-        builder: (context, viewModel, child) { 
-          
-          // Usiamo una column per impilare il selettore della settimana e la lista dei giorni
+      body: Consumer<PianoPastiViewModel>(
+        builder: (context, viewModel, child) {
           return Column(
             children: [
-              
-              // Selettore settimana
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween, // Spinge frecce ai lati e testo al centro
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     IconButton(icon: const Icon(Icons.chevron_left), onPressed: () {}),
                     const Text('20 - 26 Maggio', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
@@ -60,74 +50,99 @@ class PianoPastiView extends StatelessWidget {
                   ],
                 ),
               ),
-
-              // LISTA  DEI GIORNI
-              // Expanded serve a far prendere alla lista tutto lo spazio rimanente nello schermo
               Expanded(
                 child: ListView.builder(
-                  itemCount: 7, // 7 giorni della settimana
+                  itemCount: 7,
                   itemBuilder: (context, index) {
-                    
-                    // Prendiamo i giorni dal model PianoPasti (la lista statica)
                     String giornoCorrente = PianoPasti.giorni[index];
-
-                    // Prendiamo i dati dal viewmodel e filtriamo solo quelli del giorno corrente
                     var pastiDelGiorno = viewModel.pasti.where((p) => p.giorno == giornoCorrente).toList();
 
-                    // Disegniamo la Card (la scheda col bordo grigio) per questo giorno
                     return Card(
                       margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                      elevation: 0, // Nessuna ombra pesante
+                      elevation: 0,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
-                        side: BorderSide(color: Colors.grey.shade300, width: 1), // Bordo sottile grigio
+                        side: BorderSide(color: Colors.grey.shade300, width: 1),
                       ),
                       child: Padding(
                         padding: const EdgeInsets.all(16.0),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            
-                            // Intestazione Card: Giorno e i 3 puntini
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(giornoCorrente, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                                const Icon(Icons.more_vert, color: Colors.grey),
+                                IconButton(
+                                  icon: const Icon(Icons.more_vert, color: Colors.grey),
+                                  onPressed: () {
+                                    showModalBottomSheet(
+                                      context: context,
+                                      shape: const RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                                      ),
+                                      builder: (BuildContext context) {
+                                        return SafeArea(
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(vertical: 16.0),
+                                            child: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Padding(
+                                                  padding: const EdgeInsets.only(bottom: 16.0),
+                                                  child: Text('Modifica pasti di $giornoCorrente', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                                                ),
+                                                ...PianoPasti.tipologie.map((tipologia) {
+                                                  var pastoDaModificare = pastiDelGiorno.firstWhere(
+                                                    (p) => p.tipologia == tipologia,
+                                                    orElse: () => PianoPasti(id: '', giorno: giornoCorrente, tipologia: tipologia, nomeRicetta: '-', idRicetta: '-'),
+                                                  );
+
+                                                  return ListTile(
+                                                    leading: const Icon(Icons.edit, color: Colors.grey),
+                                                    title: Text(tipologia, style: const TextStyle(fontWeight: FontWeight.bold)),
+                                                    subtitle: Text(pastoDaModificare.nomeRicetta == '-' ? 'Nessuna ricetta' : pastoDaModificare.nomeRicetta),
+                                                    onTap: () {
+                                                      Navigator.pop(context);
+                                                      Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                          builder: (context) => SchermataModificaPianoPasti(pasto: pastoDaModificare),
+                                                        ),
+                                                      );
+                                                    },
+                                                  );
+                                                }),
+                                              ],
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    );
+                                  },
+                                ),
                               ],
                             ),
-                            const SizedBox(height: 16), // Spazio vuoto
-
-                            // Lista dei 3 pasti (Colazione, Pranzo, Cena)
-                            ...['Colazione', 'Pranzo', 'Cena'].map((tipologia) {
-                              
-                              // Cerchiamo il pasto specifico. Fallback di sicurezza in caso mancasse
+                            const SizedBox(height: 16),
+                            ...PianoPasti.tipologie.map((tipologia) {
                               var pasto = pastiDelGiorno.firstWhere(
                                 (p) => p.tipologia == tipologia,
-                                orElse: () => PianoPasti(id: '', giorno: giornoCorrente, tipologia: tipologia, nomeRicetta: '-', idRicetta: '-') // Assicurati che i parametri del costruttore siano giusti!
+                                orElse: () => PianoPasti(id: '', giorno: giornoCorrente, tipologia: tipologia, nomeRicetta: '-', idRicetta: '-'),
                               );
 
-                              // Disegniamo la riga del singolo pasto
                               return Padding(
-                                padding: const EdgeInsets.only(bottom: 8.0), // Spazio tra un pasto e l'altro
+                                padding: const EdgeInsets.symmetric(vertical: 4.0),
                                 child: Row(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    // A sinistra: Tipologia (es. "Colazione") con larghezza fissa per allineare tutto
                                     SizedBox(
-                                      width: 90, 
-                                      child: Text(
-                                        tipologia, 
-                                        style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)
-                                      ),
+                                      width: 90,
+                                      child: Text(tipologia, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
                                     ),
-                                    
-                                    // A destra: Il nome della ricetta
                                     Expanded(
                                       child: Text(
                                         pasto.nomeRicetta,
                                         style: TextStyle(
-                                          // Se la ricetta è "-" (vuota), la scriviamo in grigio chiaro, altrimenti in nero
                                           color: pasto.nomeRicetta == '-' ? Colors.grey : Colors.black87,
                                           fontSize: 14,
                                         ),
@@ -136,7 +151,7 @@ class PianoPastiView extends StatelessWidget {
                                   ],
                                 ),
                               );
-                            }), // Fine mappa pasti
+                            }).toList(),
                           ],
                         ),
                       ),

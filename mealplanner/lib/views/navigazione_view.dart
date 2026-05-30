@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dispensa/dispensa_view.dart';
 import 'piano_pasti/piano_pasti_view.dart';
+import 'lista_spesa/lista_spesa_view.dart';
 
 class SchermataPrincipale extends StatefulWidget {
   const SchermataPrincipale({super.key});
@@ -10,31 +11,26 @@ class SchermataPrincipale extends StatefulWidget {
 }
 
 class _SchermataPrincipaleState extends State<SchermataPrincipale> {
-  int _indiceSelezionato = 1; // Partiamo da 1 così l'app si apre direttamente sulla Dispensa
+  int _indiceSelezionato = 1;
 
-  // Elenco delle schermate collegate ai bottoni in basso
   final List<Widget> _pagine = [
-    const Center(child: Text('Schermata Ricette (Da implementare)')),      // Indice 0
-    const SchermataDispensa(),                                             // Indice 1
-    const PianoPastiView(),                                          // Indice 2
-    const Center(child: Text('Schermata Lista Spesa (Da implementare)')),  // Indice 3
-    const Center(child: Text('Schermata Statistiche (Da implementare)')),  // Indice 4
+    const Center(child: Text('Schermata Ricette (Da implementare)')),
+    const SchermataDispensa(),
+    const PianoPastiView(),
+    const ListaSpesaView(),
+    const Center(child: Text('Schermata Statistiche (Da implementare)')),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // Mostra la pagina attualmente selezionata in base all'indice
       body: _pagine[_indiceSelezionato],
-      
-      // La barra di navigazione inferiore 
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         currentIndex: _indiceSelezionato,
         selectedItemColor: Colors.grey.shade800,
         unselectedItemColor: Colors.grey.shade400,
         onTap: (int nuovoIndice) {
-          // Quando l'utente clicca su un'icona, cambiamo l'indice e aggiorniamo lo schermo
           setState(() {
             _indiceSelezionato = nuovoIndice;
           });

@@ -1,9 +1,10 @@
+// Attributi classe piano pasti
 class PianoPasti {
-  // Attributi classe piano pasti
   final String id;
-  final String giorno; 
-  final String tipologia; 
-  final String nomeRicetta; // Sarà il nome della ricetta, se vuoto '-' non verrà visualizzato nulla
+  final String giorno;
+  final String tipologia;
+  final String
+  nomeRicetta; // Sarà il nome della ricetta, se vuoto '-' non verrà visualizzato nulla
   final String idRicetta; // Per ricondursi alla ricetta dal ricettacolo
 
   // Costruttore
@@ -15,7 +16,7 @@ class PianoPasti {
     required this.idRicetta,
   });
 
-
+  // Lista di tipologie
   static const List<String> tipologie = [
     'Colazione',
     'Pranzo',
@@ -24,6 +25,7 @@ class PianoPasti {
     'Altro',
   ];
 
+  // Lista di giorni
   static const List<String> giorni = [
     'Lunedì',
     'Martedì',
@@ -35,7 +37,8 @@ class PianoPasti {
   ];
 
   // Metodo per convertire l'oggetto in JSON (per il salvataggio futuro)
-  Map<String, dynamic> aJson() { // Dynamic vuol dire che il valore può essere di qualsiasi tipo
+  Map<String, dynamic> aJson() {
+    // Dynamic vuol dire che il valore può essere di qualsiasi tipo
     return {
       'id': id, // Tra gli apici c'è la chiave, mentre a destra c'è il valore
       'giorno': giorno,
