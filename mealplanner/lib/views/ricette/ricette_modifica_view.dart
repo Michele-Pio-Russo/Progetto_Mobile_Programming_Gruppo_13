@@ -4,42 +4,49 @@ import '../../viewmodels/ricette_viewmodel.dart';
 import '../../viewmodels/piano_pasti_viewmodel.dart';
 import '../../models/ricette_model.dart';
 
+// Classe di supporto interna per mantenere i controller di ogni singola riga di ingrediente
 class _IngredienteRiga {
-  final TextEditingController nomeCtrl = TextEditingController();
-  final TextEditingController quantitaCtrl = TextEditingController();
-  String unitaMisura = 'g';
+  final TextEditingController nomeCtrl = TextEditingController(); // Controller per catturare il nome del singolo ingrediente
+  final TextEditingController quantitaCtrl = TextEditingController(); // Controller per catturare la quantità numerica del singolo ingrediente
+  String unitaMisura = 'g'; // Valore di default dell'unità di misura per questa riga
 
+  // Metodo per liberare la memoria quando la riga non serve più
   void dispose() {
     nomeCtrl.dispose();
     quantitaCtrl.dispose();
   }
 }
 
+// Classe che gestisce la schermata per aggiungere o modificare una ricetta
 class RicetteModificaView extends StatefulWidget {
-  final Ricette?
-  ricetta; // Se è null siamo in modalità "Aggiungi", altrimenti "Modifica"
+  final Ricette? ricetta; // Se è null siamo in modalità "Aggiungi", altrimenti "Modifica"
 
+  // Costruttore della schermata: accetta opzionalmente una ricetta da modificare
   const RicetteModificaView({super.key, this.ricetta});
 
   @override
   State<RicetteModificaView> createState() => _RicetteModificaViewState();
 }
 
+// Stato per la gestione della schermata di aggiunta/modifica ricetta
 class _RicetteModificaViewState extends State<RicetteModificaView> {
-  final _formKey = GlobalKey<FormState>();
+  final _formKey = GlobalKey<FormState>(); // Chiave per validare i campi obbligatori del form
 
-  late TextEditingController _titoloController;
-  late TextEditingController _preparazioneController;
-  late TextEditingController _tempoPreparazioneController;
-  late TextEditingController _quantitaController;
-  late TextEditingController _noteController;
-  final List<_IngredienteRiga> _ingredientiRighe = [];
+  // Controller usati per catturare e leggere i testi digitati dall'utente
+  late TextEditingController _titoloController; // Controller per il nome della ricetta
+  late TextEditingController _preparazioneController; // Controller per le istruzioni
+  late TextEditingController _tempoPreparazioneController; // Controller per i minuti richiesti
+  late TextEditingController _quantitaController; // Controller per il numero di porzioni
+  late TextEditingController _noteController; // Controller per consigli extra
+  final List<_IngredienteRiga> _ingredientiRighe = []; // Lista per gestire dinamicamente più righe di ingredienti
 
-  String? _categoriaSelezionata;
-  int _difficoltaSelezionata = 1;
+  String? _categoriaSelezionata; // Memorizza la categoria scelta dal menù a tendina
+  int _difficoltaSelezionata = 1; // Fiammelle da 1 a 5 (default 1)
 
+  // Proprietà helper per capire se stiamo creando una nuova ricetta o modificandone una esistente
   bool get eModalitaModifica => widget.ricetta != null;
 
+  // Inizializza lo stato e riempie i campi di testo se stiamo modificando una ricetta esistente
   @override
   void initState() {
     super.initState();
@@ -60,10 +67,13 @@ class _RicetteModificaViewState extends State<RicetteModificaView> {
 
     // Inizializza i controller per gli ingredienti
     if (widget.ricetta != null && widget.ricetta!.ingredienti.isNotEmpty) {
+      // Se la ricetta esiste già, leggiamo i vecchi ingredienti e creiamo una riga per ciascuno
       for (var ing in widget.ricetta!.ingredienti) {
         final riga = _IngredienteRiga();
         riga.nomeCtrl.text = ing.nome;
         riga.quantitaCtrl.text = ing.quantita;
+        
+        // Mettiamo un controllo di sicurezza per non far schiantare il menu a tendina se il valore è vecchio o corrotto
         riga.unitaMisura = ing.unitaMisura.isEmpty
             ? 'g'
             : ([
@@ -94,6 +104,7 @@ class _RicetteModificaViewState extends State<RicetteModificaView> {
     _categoriaSelezionata = widget.ricetta?.categoria;
   }
 
+  // Libera la memoria chiudendo tutti i controller quando la schermata viene chiusa
   @override
   void dispose() {
     _titoloController.dispose();
@@ -107,12 +118,14 @@ class _RicetteModificaViewState extends State<RicetteModificaView> {
     super.dispose();
   }
 
+  // Aggiunge una nuova riga vuota per permettere l'inserimento di un ingrediente extra
   void _aggiungiIngrediente() {
     setState(() {
       _ingredientiRighe.add(_IngredienteRiga());
     });
   }
 
+  // Rimuove la riga di un ingrediente e si assicura che ne rimanga sempre almeno una vuota
   void _rimuoviIngrediente(int index) {
     setState(() {
       _ingredientiRighe[index].dispose();
@@ -123,6 +136,7 @@ class _RicetteModificaViewState extends State<RicetteModificaView> {
     });
   }
 
+  // Mostra un popup di conferma quando l'utente preme il tasto rosso di eliminazione della ricetta
   void _mostraConfermaEliminazione(
     BuildContext context,
     RicetteViewModel viewModel,
@@ -168,12 +182,14 @@ class _RicetteModificaViewState extends State<RicetteModificaView> {
     );
   }
 
+  // Metodo principale che costruisce e disegna l'intera interfaccia grafica della schermata
   @override
   Widget build(BuildContext context) {
     final viewModel = Provider.of<RicetteViewModel>(context, listen: false);
 
-    return WillPopScope(
+    return WillPopScope( // WillPopScope serve per intercettare quando l'utente preme il tasto indietro del telefono (o fa lo swipe)
       onWillPop: () async {
+        // Mostriamo un dialogo per chiedere conferma se davvero si vuole uscire perdendo le modifiche
         return await showDialog(
               context: context,
               builder: (context) => AlertDialog(
@@ -186,7 +202,7 @@ class _RicetteModificaViewState extends State<RicetteModificaView> {
                 ),
                 actions: [
                   TextButton(
-                    onPressed: () => Navigator.of(context).pop(false),
+                    onPressed: () => Navigator.of(context).pop(false), // Annulla e rimane nella schermata di modifica
                     child: const Text(
                       'Annulla',
                       style: TextStyle(color: Colors.grey),
@@ -196,7 +212,7 @@ class _RicetteModificaViewState extends State<RicetteModificaView> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red,
                     ),
-                    onPressed: () => Navigator.of(context).pop(true),
+                    onPressed: () => Navigator.of(context).pop(true), // Conferma l'uscita dalla schermata
                     child: const Text(
                       'Esci senza salvare',
                       style: TextStyle(color: Colors.white),
@@ -205,7 +221,7 @@ class _RicetteModificaViewState extends State<RicetteModificaView> {
                 ],
               ),
             ) ??
-            false;
+            false; // Se il dialogo viene chiuso toccando fuori, blocca l'uscita per sicurezza
       },
       child: Scaffold(
         appBar: AppBar(
@@ -490,19 +506,23 @@ class _RicetteModificaViewState extends State<RicetteModificaView> {
                       ),
                     ),
                     onPressed: () {
+                      // Controlliamo che tutti i campi del form obbligatori (quelli con l'asterisco) siano validati
                       if (_formKey.currentState!.validate()) {
-                        // Estrapoliamo i testi dai controller degli ingredienti
+                        
+                        // Raccogliamo tutti i dati inseriti dall'utente per gli ingredienti 
+                        // Ignoriamo le righe dove il nome dell'ingrediente è stato lasciato vuoto
                         List<Ingrediente> listaIngredienti = _ingredientiRighe
                             .where((r) => r.nomeCtrl.text.trim().isNotEmpty)
                             .map(
                               (r) => Ingrediente(
                                 nome: r.nomeCtrl.text.trim(),
                                 quantita: r.quantitaCtrl.text.trim(),
-                                unitaMisura: r.unitaMisura,
+                                unitaMisura: r.unitaMisura, // Aggiungiamo l'unità di misura scelta
                               ),
                             )
                             .toList();
 
+                        // Verifica di sicurezza finale per la validazione manuale degli ingredienti
                         if (listaIngredienti.isEmpty) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
@@ -511,7 +531,7 @@ class _RicetteModificaViewState extends State<RicetteModificaView> {
                               ),
                             ),
                           );
-                          return;
+                          return; // Interrompiamo il salvataggio
                         }
 
                         if (eModalitaModifica) {
@@ -544,6 +564,7 @@ class _RicetteModificaViewState extends State<RicetteModificaView> {
                           viewModel.aggiungiRicetta(nuovaRicetta);
                         }
 
+                        // Mostra il banner verde di successo nella parte bassa dello schermo
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: Text('Ricetta salvata con successo!'),

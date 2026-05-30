@@ -5,38 +5,54 @@ import '../../models/ricette_model.dart';
 import 'ricette_modifica_view.dart';
 import 'ricette_dettaglio_view.dart';
 
+// Schermata principale che elenca tutte le ricette nel ricettacolo
 class RicetteView extends StatefulWidget {
+  // Costruttore della schermata delle ricette
   const RicetteView({super.key});
 
   @override
   State<RicetteView> createState() => _RicetteViewState();
 }
 
+// Classe per la gestione dello stato della schermata delle ricette
 class _RicetteViewState extends State<RicetteView> {
-  String _categoriaSelezionata = 'Tutte';
-  String _queryRicerca = '';
-  int? _difficoltaSelezionata;
-  String _tempoSelezionato = 'Tutti';
+  String _categoriaSelezionata = 'Tutte'; // Salva la categoria corrente selezionata per filtrare
+  String _queryRicerca = ''; // Salva il testo cercato dall'utente nella barra in alto
+  int? _difficoltaSelezionata; // null significa che vogliamo vedere "Tutte"
+  String _tempoSelezionato = 'Tutti'; // Per filtrare il tempo (es. "< 15 min")
 
+  // Disegna l'interfaccia con la barra di ricerca, i filtri e la lista delle ricette
   @override
   Widget build(BuildContext context) {
     final viewModel = Provider.of<RicetteViewModel>(context);
     
-    // Filtra prima per ricerca testuale, poi per categoria
+    // Applichiamo i filtri in sequenza: prima testo, poi categoria, difficoltà e infine il tempo
+    
+    // 1. Filtraggio tramite barra di ricerca testuale
     List<Ricette> ricetteFiltrate = viewModel.cercaRicette(_queryRicerca);
+    
+    // 2. Filtraggio tramite categoria
     if (_categoriaSelezionata != 'Tutte') {
       ricetteFiltrate = ricetteFiltrate.where((r) => r.categoria == _categoriaSelezionata).toList();
     }
+    
+    // 3. Filtraggio tramite livello di difficoltà (fiammelle)
     if (_difficoltaSelezionata != null) {
       ricetteFiltrate = ricetteFiltrate.where((r) => r.difficolta == _difficoltaSelezionata).toList();
     }
+    
+    // 4. Filtraggio tramite tempo stimato
     if (_tempoSelezionato != 'Tutti') {
       ricetteFiltrate = ricetteFiltrate.where((r) {
+        // Il tempo è salvato come testo (es. "20"), proviamo a convertirlo in numero per fare i confronti matematici
         int tempo = int.tryParse(r.tempoPreparazione) ?? 0;
+        
+        // Applichiamo i raggruppamenti del filtro
         if (_tempoSelezionato == '< 15 min') return tempo > 0 && tempo < 15;
         if (_tempoSelezionato == '15-30 min') return tempo >= 15 && tempo <= 30;
         if (_tempoSelezionato == '> 30 min') return tempo > 30;
-        return true;
+        
+        return true; // Per fallback mostriamo la ricetta
       }).toList();
     }
 
@@ -146,11 +162,11 @@ class _RicetteViewState extends State<RicetteView> {
           // Lista delle Ricette
           Expanded(
             child: ricetteFiltrate.isEmpty
-                ? const Center(child: Text('Nessuna ricetta trovata.'))
+                ? const Center(child: Text('Nessuna ricetta trovata.')) // Messaggio mostrato se i filtri escludono tutto
                 : ListView.builder(
-                    itemCount: ricetteFiltrate.length,
+                    itemCount: ricetteFiltrate.length, // Definisce quante righe generare dinamicamente
                     itemBuilder: (context, index) {
-                      final ricetta = ricetteFiltrate[index];
+                      final ricetta = ricetteFiltrate[index]; // Estraggo la ricetta specifica per questa riga
                       return Card(
                         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                         child: ListTile(
@@ -171,6 +187,7 @@ class _RicetteViewState extends State<RicetteView> {
                           title: Row(
                             children: [
                               Expanded(child: Text(ricetta.titolo, style: const TextStyle(fontWeight: FontWeight.bold))),
+                              // Se è una ricetta di sistema, mostriamo un piccolo badge "Predefinita"
                               if (ricetta.isPredefinita)
                                 Container(
                                   margin: const EdgeInsets.only(left: 8),
@@ -207,6 +224,7 @@ class _RicetteViewState extends State<RicetteView> {
                               PopupMenuButton<String>(
                                 icon: const Icon(Icons.more_vert),
                                 onSelected: (value) {
+                                  // Navighiamo alla schermata di modifica solo se cliccano l'opzione
                                   if (value == 'modifica') {
                                     Navigator.push(
                                       context,

@@ -1,14 +1,17 @@
+// Classe di supporto per gestire gli ingredienti in modo strutturato
 class Ingrediente {
-  final String nome;
-  final String quantita;
-  final String unitaMisura;
+  final String nome; // Nome dell'ingrediente (es. Farina)
+  final String quantita; // Quantità numerica (salvata come stringa)
+  final String unitaMisura; // Unità di misura (es. g, ml, pz)
 
+  // Costruttore
   Ingrediente({
     required this.nome,
     required this.quantita,
     required this.unitaMisura,
   });
 
+  // Metodo per convertire l'ingrediente in JSON per il salvataggio
   Map<String, dynamic> aJson() {
     return {
       'nome': nome,
@@ -17,6 +20,7 @@ class Ingrediente {
     };
   }
 
+  // Metodo factory per ricreare l'ingrediente leggendo dal JSON salvato
   factory Ingrediente.daJson(Map<String, dynamic> json) {
     return Ingrediente(
       nome: json['nome'] ?? '',
@@ -26,20 +30,21 @@ class Ingrediente {
   }
 }
 
+// Classe principale che rappresenta una singola ricetta
 class Ricette {
   // Attributi classe ricetta
-  final String id;
-  final String titolo;
-  final String preparazione;
-  final List<Ingrediente> ingredienti;
-  final String categoria;
-  final String tempoPreparazione;
-  final int difficolta;
-  final String quantita;
-  final String note;
-  final bool isPredefinita;
+  final String id; // Identificativo univoco della ricetta
+  final String titolo; // Nome della ricetta
+  final String preparazione; // Il procedimento passo-passo
+  final List<Ingrediente> ingredienti; // Lista degli ingredienti strutturati
+  final String categoria; // Es. Primo Piatto, Dolce, ecc.
+  final String tempoPreparazione; // Tempo richiesto in minuti (salvato testualmente)
+  final int difficolta; // Valore da 1 a 5 fiammelle
+  final String quantita; // Numero di porzioni o quantità prodotta (es. '4 persone')
+  final String note; // Consigli aggiuntivi o varianti
+  final bool isPredefinita; // Vero se è una ricetta di default fornita dall'app
 
-  // Costruttore
+  // Costruttore per creare un nuovo oggetto Ricette
   Ricette({
     required this.id,
     required this.titolo,
@@ -73,7 +78,8 @@ class Ricette {
       'id': id,
       'titolo': titolo,
       'preparazione': preparazione,
-      'ingredienti': ingredienti.map((i) => i.aJson()).toList(),
+      // Mappiamo la lista degli oggetti Ingrediente convertendoli uno a uno in formato dizionario JSON
+      'ingredienti': ingredienti.map((i) => i.aJson()).toList(), 
       'categoria': categoria,
       'tempoPreparazione': tempoPreparazione,
       'difficolta': difficolta,
@@ -85,26 +91,30 @@ class Ricette {
 
   // Metodo factory per ricreare e restituire l'oggetto leggendo dal JSON salvato
   factory Ricette.daJson(Map<String, dynamic> json) {
-    int diffParsed = 1;
+    int diffParsed = 1; // Valore di default in caso mancasse
     var diffRaw = json['difficolta'];
     if (diffRaw != null) {
       if (diffRaw is int) {
+        // Se è già un numero, lo usiamo direttamente
         diffParsed = diffRaw;
       } else if (diffRaw is String) {
+        // Se è una stringa (es. vecchi dati salvati), la mappiamo al numero corrispondente di fiammelle
         if (diffRaw == 'Facile') diffParsed = 1;
         else if (diffRaw == 'Media') diffParsed = 3;
         else if (diffRaw == 'Difficile') diffParsed = 5;
-        else diffParsed = int.tryParse(diffRaw) ?? 1;
+        else diffParsed = int.tryParse(diffRaw) ?? 1; // Tentativo di conversione finale
       }
     }
 
+    // Convertiamo gli ingredienti
     List<Ingrediente> ingredientiParsati = [];
     if (json['ingredienti'] != null) {
       for (var ing in json['ingredienti']) {
         if (ing is String) {
+          // Retrocompatibilità: se i vecchi dati erano stringhe testuali
           ingredientiParsati.add(Ingrediente(nome: ing, quantita: '', unitaMisura: ''));
         } else if (ing is Map<String, dynamic>) {
-          ingredientiParsati.add(Ingrediente.daJson(ing));
+          ingredientiParsati.add(Ingrediente.daJson(ing)); // Dati nuovi strutturati
         }
       }
     }

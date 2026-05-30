@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../models/ricette_model.dart';
 import '../servizi/salvataggio_ricette.dart';
 
+// Classe responsabile per la logica di business e gestione dello stato delle ricette
+// Usa ChangeNotifier per notificare la grafica (View) quando i dati cambiano
 class RicetteViewModel extends ChangeNotifier {
   // Lista privata di tutte le ricette nel ricettacolo
   final List<Ricette> _ricette = [];
@@ -26,16 +28,16 @@ class RicetteViewModel extends ChangeNotifier {
       ingredienti: [
         Ingrediente(nome: 'Spaghetti', quantita: '400', unitaMisura: 'g'),
         Ingrediente(nome: 'Guanciale', quantita: '150', unitaMisura: 'g'),
-        Ingrediente(nome: 'Tuorli d\'uovo', quantita: '4', unitaMisura: 'pz'),
         Ingrediente(nome: 'Pecorino Romano', quantita: '100', unitaMisura: 'g'),
-        Ingrediente(nome: 'Pepe nero', quantita: 'q.b.', unitaMisura: ''),
+        Ingrediente(nome: 'Uova', quantita: '4', unitaMisura: 'pz'),
+        Ingrediente(nome: 'Pepe nero', quantita: 'q.b.', unitaMisura: 'q.b.')
       ],
-      categoria: 'Primo Piatto',
-      tempoPreparazione: '20',
-      difficolta: 3,
-      quantita: '4 porzioni',
-      note: 'Usare guanciale e non pancetta.',
-      isPredefinita: true,
+      categoria: 'Primi piatti',
+      tempoPreparazione: '20', // Inserito numerico per agevolare i calcoli
+      difficolta: 2,
+      quantita: '4 persone',
+      note: 'Usare uova a temperatura ambiente.',
+      isPredefinita: true, // Indica che questa è una ricetta base dell'app
     ),
     Ricette(
       id: '2',
@@ -52,7 +54,7 @@ class RicetteViewModel extends ChangeNotifier {
       tempoPreparazione: '15',
       difficolta: 1,
       quantita: '2 porzioni',
-      note: 'Aggiungere crostini all\'ultimo per non ammorbidirli.',
+      note: 'Aggiungere crostini all\'ultimo per non ammoridirli.',
       isPredefinita: true,
     ),
     Ricette(
@@ -180,17 +182,19 @@ class RicetteViewModel extends ChangeNotifier {
   // Inizializza i dati caricandoli dalla memoria locale.
   // Se la memoria è vuota (primo avvio), carica le ricette predefinite e le salva.
   Future<void> _inizializzaDati() async {
-    final datiSalvati = await _servizio.caricaRicette();
-    _ricette.clear();
+    final datiSalvati = await _servizio.caricaRicette(); // Tentiamo di leggere dal database
+    _ricette.clear(); // Puliamo la lista in memoria prima di ricaricare
     
     if (datiSalvati.isEmpty) {
+      // Se non abbiamo trovato nulla, siamo al primo avvio: popoliamo con le ricette di base
       _ricette.addAll(_ricettePredefinite);
-      await _salvaSuDisco();
+      await _salvaSuDisco(); // E le salviamo subito
     } else {
+      // Altrimenti usiamo i dati che l'utente aveva salvato
       _ricette.addAll(datiSalvati);
     }
     
-    notifyListeners();
+    notifyListeners(); // Avvisa l'interfaccia utente che le ricette sono pronte
   }
 
   // Metodo privato per salvare la lista corrente su SharedPreferences
@@ -200,24 +204,26 @@ class RicetteViewModel extends ChangeNotifier {
 
   // Aggiunge una nuova ricetta al ricettacolo
   void aggiungiRicetta(Ricette nuovaRicetta) {
-    _ricette.add(nuovaRicetta);
-    _salvaSuDisco();
-    notifyListeners();
+    _ricette.add(nuovaRicetta); // Aggiunge in coda alla lista
+    _salvaSuDisco(); // Riscrive l'intero file per includere la novità
+    notifyListeners(); // Ricarica la grafica
   }
 
   // Rimuove una ricetta in base all'ID
   void rimuoviRicetta(String id) {
-    _ricette.removeWhere((ricetta) => ricetta.id == id);
+    _ricette.removeWhere((ricetta) => ricetta.id == id); // Rimuove solo la ricetta con quell'ID esatto
     _salvaSuDisco();
     notifyListeners();
   }
 
   // Modifica una ricetta esistente sostituendola
   void modificaRicettaCompleta(Ricette ricettaModificata) {
+    // Cerchiamo l'indice della ricetta da modificare all'interno della lista usando l'ID univoco
     final indice = _ricette.indexWhere((r) => r.id == ricettaModificata.id);
-    if (indice != -1) {
-      _ricette[indice] = ricettaModificata;
-      _salvaSuDisco();
+    
+    if (indice != -1) { // Se l'indice non è -1, la ricetta esiste
+      _ricette[indice] = ricettaModificata; // Sovrascriviamo l'elemento intero
+      _salvaSuDisco(); // Confermiamo il salvataggio
       notifyListeners();
     }
   }
@@ -225,8 +231,10 @@ class RicetteViewModel extends ChangeNotifier {
   // Restituisce una singola ricetta dato il suo ID (molto utile per accoppiamenti)
   Ricette? ottieniRicettaPerId(String id) {
     try {
+      // firstWhere cerca il primo elemento che soddisfa la condizione, lancia eccezione se fallisce
       return _ricette.firstWhere((r) => r.id == id);
     } catch (_) {
+      // Se non trova la ricetta (es. è stata eliminata dal db), restituisce null in sicurezza
       return null;
     }
   }
@@ -240,15 +248,18 @@ class RicetteViewModel extends ChangeNotifier {
   }
 
   // Cerca ricette tramite una parola chiave (ricerca nel titolo, nella preparazione o negli ingredienti)
+  // Funzione per filtrare la lista delle ricette in base a una stringa di ricerca
   List<Ricette> cercaRicette(String query) {
     if (query.isEmpty) {
-      return _ricette;
+      return _ricette; // Se la ricerca è vuota, mostriamo tutte le ricette senza filtri
     }
-    final q = query.toLowerCase();
+    
+    String q = query.toLowerCase(); // Convertiamo in minuscolo per una ricerca insensibile alle maiuscole
+    
     return _ricette.where((r) =>
-        r.titolo.toLowerCase().contains(q) ||
-        r.preparazione.toLowerCase().contains(q) ||
-        r.ingredienti.any((ing) => ing.nome.toLowerCase().contains(q))
+        r.titolo.toLowerCase().contains(q) || // Cerca nel titolo
+        r.preparazione.toLowerCase().contains(q) || // Cerca nel testo della preparazione
+        r.ingredienti.any((ing) => ing.nome.toLowerCase().contains(q)) // Cerca in qualsiasi degli ingredienti contenuti
     ).toList();
   }
 }
