@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart'; // Importato per i formatter di testo
 import 'package:provider/provider.dart';
 import '../../viewmodels/ricette_viewmodel.dart';
 import '../../viewmodels/piano_pasti_viewmodel.dart';
@@ -296,16 +297,16 @@ class _RicetteModificaViewState extends State<RicetteModificaView> {
                 // Tempo di preparazione
                 TextFormField(
                   controller: _tempoPreparazioneController,
-                  keyboardType: TextInputType.number,
+                  keyboardType: const TextInputType.numberWithOptions(decimal: false),
+                  inputFormatters: [
+                    FilteringTextInputFormatter.digitsOnly, // Impedisce fisicamente l'inserimento di lettere o simboli
+                  ],
                   decoration: const InputDecoration(
                     labelText: 'Tempo di preparazione* (minuti)',
                   ),
                   validator: (valore) {
                     if (valore == null || valore.trim().isEmpty) {
                       return 'Inserisci il tempo di preparazione in minuti';
-                    }
-                    if (int.tryParse(valore.trim()) == null) {
-                      return 'Deve essere un numero valido';
                     }
                     return null;
                   },
