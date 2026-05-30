@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../viewmodels/piano_pasti_viewmodel.dart';
+import '../../viewmodels/ricette_viewmodel.dart';
 import '../../models/piano_pasti_model.dart';
+import '../../models/ricette_model.dart';
 
 class SchermataModificaPianoPasti extends StatefulWidget {
   final PianoPasti? pasto;
@@ -18,21 +20,12 @@ class _SchermataModificaPianoPastiState
     extends State<SchermataModificaPianoPasti> {
   String? _giornoSelezionato;
   String? _tipologiaSelezionata;
-  String? _ricettaSelezionata;
-
-  final List<String> _ricetteDisponibili = [
-    'Spaghetti al pomodoro',
-    'Pollo con patate',
-    'Insalata mista',
-    'Pancake proteici',
-    'Tiramisù',
-  ];
+  String? _idRicettaSelezionata;
 
   @override
   void initState() {
     super.initState();
     if (widget.pasto != null) {
-      // Il giorno è pre-compilato e non più modificabile dall'utente
       _giornoSelezionato = widget.pasto!.giorno.isNotEmpty
           ? widget.pasto!.giorno
           : null;
@@ -41,11 +34,8 @@ class _SchermataModificaPianoPastiState
           ? widget.pasto!.tipologia
           : null;
 
-      if (widget.pasto!.nomeRicetta != '-') {
-        _ricettaSelezionata = widget.pasto!.nomeRicetta;
-        if (!_ricetteDisponibili.contains(_ricettaSelezionata)) {
-          _ricetteDisponibili.add(_ricettaSelezionata!);
-        }
+      if (widget.pasto!.idRicetta != '-') {
+        _idRicettaSelezionata = widget.pasto!.idRicetta;
       }
     }
   }
@@ -104,8 +94,16 @@ class _SchermataModificaPianoPastiState
   @override
   Widget build(BuildContext context) {
     final viewModel = Provider.of<PianoPastiViewModel>(context, listen: false);
+    final ricetteViewModel = Provider.of<RicetteViewModel>(context);
 
-    // È un'aggiunta se la tipologia è vuota
+    final List<Ricette> ricetteDisponibili = ricetteViewModel.ricette;
+
+    if (_idRicettaSelezionata != null && 
+        _idRicettaSelezionata != '-' && 
+        !ricetteDisponibili.any((r) => r.id == _idRicettaSelezionata)) {
+      _idRicettaSelezionata = null;
+    }
+
     final bool isAggiunta =
         widget.pasto == null || widget.pasto!.tipologia.isEmpty;
 
@@ -129,7 +127,6 @@ class _SchermataModificaPianoPastiState
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (isAggiunta) ...[
-              // Banner informativo al posto del menu a tendina
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
@@ -217,7 +214,7 @@ class _SchermataModificaPianoPastiState
             ),
             const SizedBox(height: 8),
             DropdownButtonFormField<String>(
-              value: _ricettaSelezionata,
+              value: _idRicettaSelezionata,
               hint: const Text('Tocca per scegliere una ricetta...'),
               decoration: InputDecoration(
                 border: OutlineInputBorder(
@@ -229,15 +226,15 @@ class _SchermataModificaPianoPastiState
                 ),
                 prefixIcon: const Icon(Icons.restaurant_menu),
               ),
-              items: _ricetteDisponibili.map((String nomeRicetta) {
+              items: ricetteDisponibili.map((Ricette ricetta) {
                 return DropdownMenuItem<String>(
-                  value: nomeRicetta,
-                  child: Text(nomeRicetta),
+                  value: ricetta.id,
+                  child: Text(ricetta.titolo),
                 );
               }).toList(),
-              onChanged: (nuovaScelta) {
+              onChanged: (nuovoId) {
                 setState(() {
-                  _ricettaSelezionata = nuovaScelta;
+                  _idRicettaSelezionata = nuovoId;
                 });
               },
             ),
@@ -260,7 +257,17 @@ class _SchermataModificaPianoPastiState
                     return;
                   }
 
-                  String nomeRicettaInserita = _ricettaSelezionata ?? '-';
+                  String nomeRicettaInserita = '-';
+                  String idRicettaInserita = '-';
+
+                  if (_idRicettaSelezionata != null) {
+                    final ricettaScelta = ricetteViewModel.ottieniRicettaPerId(_idRicettaSelezionata!);
+                    if (ricettaScelta != null) {
+                      nomeRicettaInserita = ricettaScelta.titolo;
+                      idRicettaInserita = ricettaScelta.id;
+                    }
+                  }
+
                   String idCasella =
                       '${_giornoSelezionato!.substring(0, 3).toLowerCase()}_${_tipologiaSelezionata!.substring(0, 3).toLowerCase()}';
 
@@ -269,9 +276,7 @@ class _SchermataModificaPianoPastiState
                     _giornoSelezionato!,
                     _tipologiaSelezionata!,
                     nomeRicettaInserita,
-                    nomeRicettaInserita == '-'
-                        ? '-'
-                        : 'id_${nomeRicettaInserita.replaceAll(' ', '_').toLowerCase()}',
+                    idRicettaInserita,
                   );
 
                   Navigator.pop(context);
