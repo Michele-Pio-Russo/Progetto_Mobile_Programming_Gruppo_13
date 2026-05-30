@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import '../../models/ricette_model.dart';
 
+// Schermata che mostra i dettagli e le istruzioni di una singola ricetta in sola lettura
 class RicetteDettaglioView extends StatelessWidget {
-  final Ricette ricetta;
+  final Ricette ricetta; // La ricetta di cui stiamo visualizzando i dettagli
 
+  // Costruttore della schermata di dettaglio, richiede la ricetta da visualizzare
   const RicetteDettaglioView({super.key, required this.ricetta});
 
+  // Costruisce l'interfaccia principale mostrando titolo, dettagli, ingredienti e procedimento
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,9 +40,10 @@ class RicetteDettaglioView extends StatelessWidget {
             const SizedBox(height: 20),
 
             // Informazioni Rapide (Tempo, Difficoltà, Quantità)
-              Row(
+            Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
+                // Mostriamo il tempo aggiungendo "min" e la difficoltà usando il costruttore delle fiammelle
                 _buildInfoBadge(Icons.timer, '${ricetta.tempoPreparazione} min'),
                 _buildDifficoltaBadge(ricetta.difficolta),
                 _buildInfoBadge(Icons.restaurant, ricetta.quantita),
@@ -57,6 +61,7 @@ class RicetteDettaglioView extends StatelessWidget {
                       const Icon(Icons.circle, size: 8, color: Colors.grey),
                       const SizedBox(width: 10),
                       Expanded(
+                        // Formattiamo gli ingredienti strutturati: omettiamo l'unità se è "altro"
                         child: Text(
                           '${ing.nome} - ${ing.quantita} ${ing.unitaMisura == "altro" ? "" : ing.unitaMisura}'.trimRight(), 
                           style: const TextStyle(fontSize: 16)
@@ -96,6 +101,7 @@ class RicetteDettaglioView extends StatelessWidget {
     );
   }
 
+  // Helper method: Costruisce un piccolo blocco grafico con un'icona e un testo (usato per tempo e quantità)
   Widget _buildInfoBadge(IconData icon, String label) {
     return Expanded(
       child: Column(
@@ -108,6 +114,7 @@ class RicetteDettaglioView extends StatelessWidget {
     );
   }
 
+  // Helper method: Costruisce il blocco grafico speciale per mostrare le fiammelle della difficoltà
   Widget _buildDifficoltaBadge(int difficolta) {
     return Expanded(
       child: Column(
