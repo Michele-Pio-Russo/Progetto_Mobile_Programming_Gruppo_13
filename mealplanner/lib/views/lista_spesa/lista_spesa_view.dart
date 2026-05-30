@@ -7,6 +7,31 @@ import 'lista_spesa_aggiunta_view.dart';
 class ListaSpesaView extends StatelessWidget {
   const ListaSpesaView({super.key});
 
+  void _mostraDialogConferma(BuildContext context, ListaSpesaViewModel viewModel) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Conferma rimozione'),
+          content: const Text('Vuoi davvero rimuovere tutti gli articoli marcati come comprati?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Annulla', style: TextStyle(color: Colors.grey)),
+            ),
+            TextButton(
+              onPressed: () {
+                viewModel.rimuoviProdottiComprati();
+                Navigator.pop(context);
+              },
+              child: const Text('Rimuovi', style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,6 +45,19 @@ class ListaSpesaView extends StatelessWidget {
         ),
         centerTitle: false,
         iconTheme: const IconThemeData(color: Colors.black),
+        actions: [
+          Consumer<ListaSpesaViewModel>(
+            builder: (context, viewModel, child) {
+              final haProdottiComprati = viewModel.prodotti.any((p) => p.comprato);
+              if (!haProdottiComprati) return const SizedBox.shrink();
+
+              return IconButton(
+                icon: const Icon(Icons.delete_sweep, color: Colors.black),
+                onPressed: () => _mostraDialogConferma(context, viewModel),
+              );
+            },
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -33,7 +71,7 @@ class ListaSpesaView extends StatelessWidget {
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
         elevation: 2,
-        shape: CircleBorder(side: BorderSide(color: Colors.grey.shade300)),
+        shape: const CircleBorder(side: BorderSide(color: Colors.white30)),
         child: const Icon(Icons.add, size: 28),
       ),
       body: Consumer<ListaSpesaViewModel>(
@@ -84,11 +122,27 @@ class ListaSpesaView extends StatelessWidget {
                       color: prodotto.comprato ? Colors.grey : Colors.black87,
                     ),
                   ),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.delete_outline, color: Colors.red),
-                    onPressed: () {
-                      viewModel.rimuoviProdotto(prodotto.id);
-                    },
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.edit_outlined, color: Colors.grey),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => SchermataAggiuntaSpesa(prodotto: prodotto),
+                            ),
+                          );
+                        },
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.delete_outline, color: Colors.red),
+                        onPressed: () {
+                          viewModel.rimuoviProdotto(prodotto.id);
+                        },
+                      ),
+                    ],
                   ),
                 ),
               );
