@@ -4,14 +4,8 @@ import 'package:provider/provider.dart';
 import '../../viewmodels/piano_pasti_viewmodel.dart';
 import '../../models/piano_pasti_model.dart';
 import 'piano_pasti_modifica_view.dart';
-
-import '../ricette/ricette_dettaglio_view.dart'; // <-- Modifica questo percorso in base al tuo progetto
-
-// IMPORTA IL MODELLO RICETTE (serve se usi l'opzione Mock o se devi tipizzare la ricerca)
+import '../ricette/ricette_dettaglio_view.dart';
 import '../../models/ricette_model.dart';
-
-// IMPORTA IL VIEWMODEL DELLE RICETTE (se ne hai uno per cercare la ricetta tramite ID)
-// import '../../viewmodels/ricette_viewmodel.dart';
 
 class PianoPastiView extends StatelessWidget {
   const PianoPastiView({super.key});
@@ -114,14 +108,14 @@ class PianoPastiView extends StatelessWidget {
                                           MaterialPageRoute(
                                             builder: (context) =>
                                                 SchermataModificaPianoPasti(
-                                                  pasto: PianoPasti(
-                                                    id: '',
-                                                    giorno: giornoCorrente,
-                                                    tipologia: '',
-                                                    nomeRicetta: '-',
-                                                    idRicetta: '-',
-                                                  ),
-                                                ),
+                                              pasto: PianoPasti(
+                                                id: '',
+                                                giorno: giornoCorrente,
+                                                tipologia: '',
+                                                nomeRicetta: '-',
+                                                idRicetta: '-',
+                                              ),
+                                            ),
                                           ),
                                         );
                                       },
@@ -144,8 +138,8 @@ class PianoPastiView extends StatelessWidget {
                                               child: Padding(
                                                 padding:
                                                     const EdgeInsets.symmetric(
-                                                      vertical: 16.0,
-                                                    ),
+                                                  vertical: 16.0,
+                                                ),
                                                 child: Column(
                                                   mainAxisSize:
                                                       MainAxisSize.min,
@@ -153,8 +147,8 @@ class PianoPastiView extends StatelessWidget {
                                                     Padding(
                                                       padding:
                                                           const EdgeInsets.only(
-                                                            bottom: 16.0,
-                                                          ),
+                                                        bottom: 16.0,
+                                                      ),
                                                       child: Text(
                                                         'Modifica pasti di $giornoCorrente',
                                                         style: const TextStyle(
@@ -206,7 +200,7 @@ class PianoPastiView extends StatelessWidget {
                                                                   '-'
                                                               ? 'Nessuna ricetta'
                                                               : pastoDaModificare
-                                                                    .nomeRicetta,
+                                                                  .nomeRicetta,
                                                         ),
                                                         onTap: () {
                                                           Navigator.pop(
@@ -217,9 +211,9 @@ class PianoPastiView extends StatelessWidget {
                                                             MaterialPageRoute(
                                                               builder: (context) =>
                                                                   SchermataModificaPianoPasti(
-                                                                    pasto:
-                                                                        pastoDaModificare,
-                                                                  ),
+                                                                pasto:
+                                                                    pastoDaModificare,
+                                                              ),
                                                             ),
                                                           );
                                                         },
@@ -278,7 +272,6 @@ class PianoPastiView extends StatelessWidget {
                                         ),
                                       ),
                                     ),
-                                    // NUOVA LOGICA COLLEGAMENTO OCCHIO -> DETTAGLIO RICETTA
                                     if (pasto.nomeRicetta != '-')
                                       InkWell(
                                         onTap: () {
@@ -290,22 +283,17 @@ class PianoPastiView extends StatelessWidget {
                                                   id: pasto.idRicetta,
                                                   titolo: pasto.nomeRicetta,
                                                   categoria: 'Piano Pasti',
-                                                  tempoPreparazione:
-                                                      '25', // Modificato da int a String come da modello
+                                                  tempoPreparazione: '25',
                                                   difficolta: 2,
                                                   quantita: 'Per 2 persone',
                                                   ingredienti: [],
-                                                  preparazione:
-                                                      'Procedimento caricato dal piano pasti...',
-                                                  note:
-                                                      'Nessuna nota temporanea.',
-                                                  isPredefinita:
-                                                      false, // Aggiunto perché obbligatorio nel costruttore
+                                                  preparazione: 'Procedimento caricato dal piano pasti...',
+                                                  note: 'Nessuna nota temporanea.',
+                                                  isPredefinita: false,
                                                 ),
                                               ),
                                             ),
                                           );
-                                          // */
                                         },
                                         borderRadius: BorderRadius.circular(20),
                                         child: const Padding(
