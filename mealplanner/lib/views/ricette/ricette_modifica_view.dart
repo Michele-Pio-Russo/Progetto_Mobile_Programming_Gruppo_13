@@ -6,9 +6,12 @@ import '../../models/ricette_model.dart';
 
 // Classe di supporto interna per mantenere i controller di ogni singola riga di ingrediente
 class _IngredienteRiga {
-  final TextEditingController nomeCtrl = TextEditingController(); // Controller per catturare il nome del singolo ingrediente
-  final TextEditingController quantitaCtrl = TextEditingController(); // Controller per catturare la quantità numerica del singolo ingrediente
-  String unitaMisura = 'g'; // Valore di default dell'unità di misura per questa riga
+  final TextEditingController nomeCtrl =
+      TextEditingController(); // Controller per catturare il nome del singolo ingrediente
+  final TextEditingController quantitaCtrl =
+      TextEditingController(); // Controller per catturare la quantità numerica del singolo ingrediente
+  String unitaMisura =
+      'g'; // Valore di default dell'unità di misura per questa riga
 
   // Metodo per liberare la memoria quando la riga non serve più
   void dispose() {
@@ -19,7 +22,8 @@ class _IngredienteRiga {
 
 // Classe che gestisce la schermata per aggiungere o modificare una ricetta
 class RicetteModificaView extends StatefulWidget {
-  final Ricette? ricetta; // Se è null siamo in modalità "Aggiungi", altrimenti "Modifica"
+  final Ricette?
+  ricetta; // Se è null siamo in modalità "Aggiungi", altrimenti "Modifica"
 
   // Costruttore della schermata: accetta opzionalmente una ricetta da modificare
   const RicetteModificaView({super.key, this.ricetta});
@@ -30,17 +34,26 @@ class RicetteModificaView extends StatefulWidget {
 
 // Stato per la gestione della schermata di aggiunta/modifica ricetta
 class _RicetteModificaViewState extends State<RicetteModificaView> {
-  final _formKey = GlobalKey<FormState>(); // Chiave per validare i campi obbligatori del form
+  final _formKey =
+      GlobalKey<
+        FormState
+      >(); // Chiave per validare i campi obbligatori del form
 
   // Controller usati per catturare e leggere i testi digitati dall'utente
-  late TextEditingController _titoloController; // Controller per il nome della ricetta
-  late TextEditingController _preparazioneController; // Controller per le istruzioni
-  late TextEditingController _tempoPreparazioneController; // Controller per i minuti richiesti
-  late TextEditingController _quantitaController; // Controller per il numero di porzioni
+  late TextEditingController
+  _titoloController; // Controller per il nome della ricetta
+  late TextEditingController
+  _preparazioneController; // Controller per le istruzioni
+  late TextEditingController
+  _tempoPreparazioneController; // Controller per i minuti richiesti
+  late TextEditingController
+  _quantitaController; // Controller per il numero di porzioni
   late TextEditingController _noteController; // Controller per consigli extra
-  final List<_IngredienteRiga> _ingredientiRighe = []; // Lista per gestire dinamicamente più righe di ingredienti
+  final List<_IngredienteRiga> _ingredientiRighe =
+      []; // Lista per gestire dinamicamente più righe di ingredienti
 
-  String? _categoriaSelezionata; // Memorizza la categoria scelta dal menù a tendina
+  String?
+  _categoriaSelezionata; // Memorizza la categoria scelta dal menù a tendina
   int _difficoltaSelezionata = 1; // Fiammelle da 1 a 5 (default 1)
 
   // Proprietà helper per capire se stiamo creando una nuova ricetta o modificandone una esistente
@@ -72,7 +85,7 @@ class _RicetteModificaViewState extends State<RicetteModificaView> {
         final riga = _IngredienteRiga();
         riga.nomeCtrl.text = ing.nome;
         riga.quantitaCtrl.text = ing.quantita;
-        
+
         // Mettiamo un controllo di sicurezza per non far schiantare il menu a tendina se il valore è vecchio o corrotto
         riga.unitaMisura = ing.unitaMisura.isEmpty
             ? 'g'
@@ -187,7 +200,8 @@ class _RicetteModificaViewState extends State<RicetteModificaView> {
   Widget build(BuildContext context) {
     final viewModel = Provider.of<RicetteViewModel>(context, listen: false);
 
-    return WillPopScope( // WillPopScope serve per intercettare quando l'utente preme il tasto indietro del telefono (o fa lo swipe)
+    return WillPopScope(
+      // WillPopScope serve per intercettare quando l'utente preme il tasto indietro del telefono (o fa lo swipe)
       onWillPop: () async {
         // Mostriamo un dialogo per chiedere conferma se davvero si vuole uscire perdendo le modifiche
         return await showDialog(
@@ -202,7 +216,9 @@ class _RicetteModificaViewState extends State<RicetteModificaView> {
                 ),
                 actions: [
                   TextButton(
-                    onPressed: () => Navigator.of(context).pop(false), // Annulla e rimane nella schermata di modifica
+                    onPressed: () => Navigator.of(context).pop(
+                      false,
+                    ), // Annulla e rimane nella schermata di modifica
                     child: const Text(
                       'Annulla',
                       style: TextStyle(color: Colors.grey),
@@ -212,7 +228,9 @@ class _RicetteModificaViewState extends State<RicetteModificaView> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red,
                     ),
-                    onPressed: () => Navigator.of(context).pop(true), // Conferma l'uscita dalla schermata
+                    onPressed: () => Navigator.of(
+                      context,
+                    ).pop(true), // Conferma l'uscita dalla schermata
                     child: const Text(
                       'Esci senza salvare',
                       style: TextStyle(color: Colors.white),
@@ -318,11 +336,8 @@ class _RicetteModificaViewState extends State<RicetteModificaView> {
                 TextFormField(
                   controller: _quantitaController,
                   decoration: const InputDecoration(
-                    labelText: 'Quantità* (es. 2 porzioni)',
+                    labelText: 'Quantità (es. 2 porzioni)',
                   ),
-                  validator: (valore) => (valore == null || valore.isEmpty)
-                      ? 'Inserisci la quantità o il numero di porzioni'
-                      : null,
                 ),
                 const SizedBox(height: 16),
 
@@ -330,12 +345,9 @@ class _RicetteModificaViewState extends State<RicetteModificaView> {
                 TextFormField(
                   controller: _preparazioneController,
                   decoration: const InputDecoration(
-                    labelText: 'Procedimento (Preparazione)*',
+                    labelText: 'Procedimento (Preparazione)',
                   ),
                   maxLines: 3,
-                  validator: (valore) => (valore == null || valore.isEmpty)
-                      ? 'Inserisci il procedimento'
-                      : null,
                 ),
                 const SizedBox(height: 16),
 
@@ -393,7 +405,7 @@ class _RicetteModificaViewState extends State<RicetteModificaView> {
                             controller: riga.quantitaCtrl,
                             keyboardType: TextInputType.number,
                             decoration: InputDecoration(
-                              hintText: 'Q.tà',
+                              hintText: 'Quantità',
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10),
                               ),
@@ -508,8 +520,7 @@ class _RicetteModificaViewState extends State<RicetteModificaView> {
                     onPressed: () {
                       // Controlliamo che tutti i campi del form obbligatori (quelli con l'asterisco) siano validati
                       if (_formKey.currentState!.validate()) {
-                        
-                        // Raccogliamo tutti i dati inseriti dall'utente per gli ingredienti 
+                        // Raccogliamo tutti i dati inseriti dall'utente per gli ingredienti
                         // Ignoriamo le righe dove il nome dell'ingrediente è stato lasciato vuoto
                         List<Ingrediente> listaIngredienti = _ingredientiRighe
                             .where((r) => r.nomeCtrl.text.trim().isNotEmpty)
@@ -517,7 +528,8 @@ class _RicetteModificaViewState extends State<RicetteModificaView> {
                               (r) => Ingrediente(
                                 nome: r.nomeCtrl.text.trim(),
                                 quantita: r.quantitaCtrl.text.trim(),
-                                unitaMisura: r.unitaMisura, // Aggiungiamo l'unità di misura scelta
+                                unitaMisura: r
+                                    .unitaMisura, // Aggiungiamo l'unità di misura scelta
                               ),
                             )
                             .toList();
