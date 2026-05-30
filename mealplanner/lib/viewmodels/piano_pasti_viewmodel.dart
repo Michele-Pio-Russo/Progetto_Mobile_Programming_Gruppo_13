@@ -91,4 +91,22 @@ class PianoPastiViewModel extends ChangeNotifier{ // Con ChangeNotifier, possiam
       notifyListeners();
     }
   }
+
+  // Rimuove i riferimenti a una ricetta eliminata dal ricettacolo
+  void rimuoviRiferimentiRicetta(String idRicetta) {
+    bool modificato = false;
+    for (int i = 0; i < _pasti.length; i++) {
+      if (_pasti[i].idRicetta == idRicetta) {
+        _pasti[i] = PianoPasti(
+          id: _pasti[i].id,
+          giorno: _pasti[i].giorno,
+          tipologia: _pasti[i].tipologia,
+          nomeRicetta: '-',
+          idRicetta: '-',
+        );
+        modificato = true;
+      }
+    }
+    if (modificato) notifyListeners();
+  }
 }

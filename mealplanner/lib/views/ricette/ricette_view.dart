@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../viewmodels/ricette_viewmodel.dart';
 import '../../models/ricette_model.dart';
 import 'ricette_modifica_view.dart';
+import 'ricette_dettaglio_view.dart';
 
 class RicetteView extends StatefulWidget {
   const RicetteView({super.key});
@@ -14,6 +15,8 @@ class RicetteView extends StatefulWidget {
 class _RicetteViewState extends State<RicetteView> {
   String _categoriaSelezionata = 'Tutte';
   String _queryRicerca = '';
+  int? _difficoltaSelezionata;
+  String _tempoSelezionato = 'Tutti';
 
   @override
   Widget build(BuildContext context) {
@@ -23,6 +26,18 @@ class _RicetteViewState extends State<RicetteView> {
     List<Ricette> ricetteFiltrate = viewModel.cercaRicette(_queryRicerca);
     if (_categoriaSelezionata != 'Tutte') {
       ricetteFiltrate = ricetteFiltrate.where((r) => r.categoria == _categoriaSelezionata).toList();
+    }
+    if (_difficoltaSelezionata != null) {
+      ricetteFiltrate = ricetteFiltrate.where((r) => r.difficolta == _difficoltaSelezionata).toList();
+    }
+    if (_tempoSelezionato != 'Tutti') {
+      ricetteFiltrate = ricetteFiltrate.where((r) {
+        int tempo = int.tryParse(r.tempoPreparazione) ?? 0;
+        if (_tempoSelezionato == '< 15 min') return tempo > 0 && tempo < 15;
+        if (_tempoSelezionato == '15-30 min') return tempo >= 15 && tempo <= 30;
+        if (_tempoSelezionato == '> 30 min') return tempo > 30;
+        return true;
+      }).toList();
     }
 
     return Scaffold(
@@ -91,6 +106,41 @@ class _RicetteViewState extends State<RicetteView> {
             ),
           ),
           
+          // Filtri avanzati
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Row(
+              children: [
+                // Filtro Difficoltà
+                DropdownButton<int?>(
+                  value: _difficoltaSelezionata,
+                  hint: const Text('Difficoltà'),
+                  items: [
+                    const DropdownMenuItem(value: null, child: Text('Tutte le difficoltà')),
+                    ...List.generate(5, (index) => DropdownMenuItem(
+                      value: index + 1, 
+                      child: Row(
+                        children: List.generate(index + 1, (_) => const Icon(Icons.local_fire_department, color: Colors.orange, size: 16))
+                      )
+                    )),
+                  ],
+                  onChanged: (val) => setState(() => _difficoltaSelezionata = val),
+                ),
+                const SizedBox(width: 16),
+                // Filtro Tempo
+                DropdownButton<String>(
+                  value: _tempoSelezionato,
+                  hint: const Text('Tempo'),
+                  items: ['Tutti', '< 15 min', '15-30 min', '> 30 min'].map((t) => DropdownMenuItem(value: t, child: Text(t))).toList(),
+                  onChanged: (val) {
+                    if (val != null) setState(() => _tempoSelezionato = val);
+                  },
+                ),
+              ],
+            ),
+          ),
+
           const SizedBox(height: 10),
           
           // Lista delle Ricette
@@ -108,7 +158,7 @@ class _RicetteViewState extends State<RicetteView> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => RicetteModificaView(ricetta: ricetta),
+                                builder: (context) => RicetteDettaglioView(ricetta: ricetta),
                               ),
                             );
                           },
@@ -118,27 +168,68 @@ class _RicetteViewState extends State<RicetteView> {
                             color: Colors.grey.shade200,
                             child: const Icon(Icons.restaurant, color: Colors.grey),
                           ),
-                          title: Text(ricetta.titolo, style: const TextStyle(fontWeight: FontWeight.bold)),
+                          title: Row(
+                            children: [
+                              Expanded(child: Text(ricetta.titolo, style: const TextStyle(fontWeight: FontWeight.bold))),
+                              if (ricetta.isPredefinita)
+                                Container(
+                                  margin: const EdgeInsets.only(left: 8),
+                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                  decoration: BoxDecoration(color: Colors.amber.shade100, borderRadius: BorderRadius.circular(8)),
+                                  child: Text('⭐ Predefinita', style: TextStyle(fontSize: 10, color: Colors.orange.shade800, fontWeight: FontWeight.bold)),
+                                ),
+                            ],
+                          ),
                           subtitle: Text(
                             ricetta.preparazione,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(fontSize: 12),
                           ),
-                          trailing: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: Colors.blue.shade100,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Text(
-                              ricetta.categoria,
-                              style: TextStyle(
-                                color: Colors.blue.shade700,
-                                fontSize: 11,
-                                fontWeight: FontWeight.bold,
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: Colors.blue.shade100,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Text(
+                                  ricetta.categoria,
+                                  style: TextStyle(
+                                    color: Colors.blue.shade700,
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                               ),
-                            ),
+                              PopupMenuButton<String>(
+                                icon: const Icon(Icons.more_vert),
+                                onSelected: (value) {
+                                  if (value == 'modifica') {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => RicetteModificaView(ricetta: ricetta),
+                                      ),
+                                    );
+                                  }
+                                },
+                                itemBuilder: (BuildContext context) => [
+                                  const PopupMenuItem(
+                                    value: 'modifica',
+                                    child: Row(
+                                      children: [
+                                        Icon(Icons.edit, size: 20),
+                                        SizedBox(width: 8),
+                                        Text('Modifica'),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
                           ),
                         ),
                       );

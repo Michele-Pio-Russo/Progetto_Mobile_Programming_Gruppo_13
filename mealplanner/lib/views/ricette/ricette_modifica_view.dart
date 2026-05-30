@@ -1,10 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../viewmodels/ricette_viewmodel.dart';
+import '../../viewmodels/piano_pasti_viewmodel.dart';
 import '../../models/ricette_model.dart';
 
+class _IngredienteRiga {
+  final TextEditingController nomeCtrl = TextEditingController();
+  final TextEditingController quantitaCtrl = TextEditingController();
+  String unitaMisura = 'g';
+
+  void dispose() {
+    nomeCtrl.dispose();
+    quantitaCtrl.dispose();
+  }
+}
+
 class RicetteModificaView extends StatefulWidget {
-  final Ricette? ricetta; // Se è null siamo in modalità "Aggiungi", altrimenti "Modifica"
+  final Ricette?
+  ricetta; // Se è null siamo in modalità "Aggiungi", altrimenti "Modifica"
 
   const RicetteModificaView({super.key, this.ricetta});
 
@@ -17,27 +30,67 @@ class _RicetteModificaViewState extends State<RicetteModificaView> {
 
   late TextEditingController _titoloController;
   late TextEditingController _preparazioneController;
-  final List<TextEditingController> _ingredientiControllers = [];
+  late TextEditingController _tempoPreparazioneController;
+  late TextEditingController _quantitaController;
+  late TextEditingController _noteController;
+  final List<_IngredienteRiga> _ingredientiRighe = [];
 
   String? _categoriaSelezionata;
+  int _difficoltaSelezionata = 1;
 
   bool get eModalitaModifica => widget.ricetta != null;
 
   @override
   void initState() {
     super.initState();
-    _titoloController = TextEditingController(text: widget.ricetta?.titolo ?? '');
-    _preparazioneController = TextEditingController(text: widget.ricetta?.preparazione ?? '');
-    
+    _titoloController = TextEditingController(
+      text: widget.ricetta?.titolo ?? '',
+    );
+    _preparazioneController = TextEditingController(
+      text: widget.ricetta?.preparazione ?? '',
+    );
+    _tempoPreparazioneController = TextEditingController(
+      text: widget.ricetta?.tempoPreparazione ?? '',
+    );
+    _quantitaController = TextEditingController(
+      text: widget.ricetta?.quantita ?? '',
+    );
+    _noteController = TextEditingController(text: widget.ricetta?.note ?? '');
+    _difficoltaSelezionata = widget.ricetta?.difficolta ?? 1;
+
     // Inizializza i controller per gli ingredienti
     if (widget.ricetta != null && widget.ricetta!.ingredienti.isNotEmpty) {
-      for (String ing in widget.ricetta!.ingredienti) {
-        _ingredientiControllers.add(TextEditingController(text: ing));
+      for (var ing in widget.ricetta!.ingredienti) {
+        final riga = _IngredienteRiga();
+        riga.nomeCtrl.text = ing.nome;
+        riga.quantitaCtrl.text = ing.quantita;
+        riga.unitaMisura = ing.unitaMisura.isEmpty
+            ? 'g'
+            : ([
+                    'g',
+                    'kg',
+                    'ml',
+                    'L',
+                    'pz',
+                    'cucchiai',
+                    'q.b.',
+                    'fette',
+                    'spicchio',
+                    'cespo',
+                    'tazza',
+                    'foglie',
+                    'costa',
+                    'bustina',
+                    'altro',
+                  ].contains(ing.unitaMisura)
+                  ? ing.unitaMisura
+                  : 'altro');
+        _ingredientiRighe.add(riga);
       }
     } else {
-      _ingredientiControllers.add(TextEditingController()); // Almeno uno vuoto
+      _ingredientiRighe.add(_IngredienteRiga()); // Almeno uno vuoto
     }
-    
+
     _categoriaSelezionata = widget.ricetta?.categoria;
   }
 
@@ -45,49 +98,69 @@ class _RicetteModificaViewState extends State<RicetteModificaView> {
   void dispose() {
     _titoloController.dispose();
     _preparazioneController.dispose();
-    for (var controller in _ingredientiControllers) {
-      controller.dispose();
+    _tempoPreparazioneController.dispose();
+    _quantitaController.dispose();
+    _noteController.dispose();
+    for (var riga in _ingredientiRighe) {
+      riga.dispose();
     }
     super.dispose();
   }
 
   void _aggiungiIngrediente() {
     setState(() {
-      _ingredientiControllers.add(TextEditingController());
+      _ingredientiRighe.add(_IngredienteRiga());
     });
   }
 
   void _rimuoviIngrediente(int index) {
     setState(() {
-      _ingredientiControllers[index].dispose();
-      _ingredientiControllers.removeAt(index);
-      if (_ingredientiControllers.isEmpty) {
-        _ingredientiControllers.add(TextEditingController());
+      _ingredientiRighe[index].dispose();
+      _ingredientiRighe.removeAt(index);
+      if (_ingredientiRighe.isEmpty) {
+        _ingredientiRighe.add(_IngredienteRiga());
       }
     });
   }
 
-  void _mostraConfermaEliminazione(BuildContext context, RicetteViewModel viewModel) {
+  void _mostraConfermaEliminazione(
+    BuildContext context,
+    RicetteViewModel viewModel,
+  ) {
     showDialog(
       context: context,
       builder: (BuildContext ctx) {
         return AlertDialog(
           title: const Text('Eliminare ricetta?'),
-          content: Text('Sei sicuro di voler eliminare la ricetta "${widget.ricetta!.titolo}"? L\'operazione non può essere annullata.'),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          content: Text(
+            'Sei sicuro di voler eliminare la ricetta "${widget.ricetta!.titolo}"? L\'operazione non può essere annullata.',
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx),
-              child: const Text('Annulla', style: TextStyle(color: Colors.grey)),
+              child: const Text(
+                'Annulla',
+                style: TextStyle(color: Colors.grey),
+              ),
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
               onPressed: () {
                 viewModel.rimuoviRicetta(widget.ricetta!.id);
+                Provider.of<PianoPastiViewModel>(
+                  context,
+                  listen: false,
+                ).rimuoviRiferimentiRicetta(widget.ricetta!.id);
                 Navigator.pop(ctx);
                 Navigator.pop(context);
               },
-              child: const Text('Elimina', style: TextStyle(color: Colors.white)),
+              child: const Text(
+                'Elimina',
+                style: TextStyle(color: Colors.white),
+              ),
             ),
           ],
         );
@@ -99,158 +172,399 @@ class _RicetteModificaViewState extends State<RicetteModificaView> {
   Widget build(BuildContext context) {
     final viewModel = Provider.of<RicetteViewModel>(context, listen: false);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(eModalitaModifica ? 'Modifica Ricetta' : 'Nuova Ricetta', 
-            style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.black),
-        actions: [
-          if (eModalitaModifica)
-            IconButton(
-              icon: const Icon(Icons.delete, color: Colors.red),
-              onPressed: () {
-                _mostraConfermaEliminazione(context, viewModel);
-              },
+    return WillPopScope(
+      onWillPop: () async {
+        return await showDialog(
+              context: context,
+              builder: (context) => AlertDialog(
+                title: const Text('Scartare le modifiche?'),
+                content: const Text(
+                  'Uscendo perderai tutte le modifiche non salvate. Continuare?',
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(false),
+                    child: const Text(
+                      'Annulla',
+                      style: TextStyle(color: Colors.grey),
+                    ),
+                  ),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                    ),
+                    onPressed: () => Navigator.of(context).pop(true),
+                    child: const Text(
+                      'Esci senza salvare',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ],
+              ),
+            ) ??
+            false;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            eModalitaModifica ? 'Modifica Ricetta' : 'Nuova Ricetta',
+            style: const TextStyle(
+              color: Colors.black,
+              fontWeight: FontWeight.bold,
             ),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            children: [
-              // Titolo
-              TextFormField(
-                controller: _titoloController,
-                decoration: const InputDecoration(labelText: 'Titolo*'),
-                validator: (valore) => (valore == null || valore.isEmpty) ? 'Inserisci il titolo' : null,
+          ),
+          backgroundColor: Colors.white,
+          elevation: 0,
+          iconTheme: const IconThemeData(color: Colors.black),
+          actions: [
+            if (eModalitaModifica)
+              IconButton(
+                icon: const Icon(Icons.delete, color: Colors.red),
+                onPressed: () {
+                  _mostraConfermaEliminazione(context, viewModel);
+                },
               ),
-              const SizedBox(height: 16),
+          ],
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Form(
+            key: _formKey,
+            child: ListView(
+              children: [
+                // Titolo
+                TextFormField(
+                  controller: _titoloController,
+                  decoration: const InputDecoration(labelText: 'Titolo*'),
+                  validator: (valore) => (valore == null || valore.isEmpty)
+                      ? 'Inserisci il titolo'
+                      : null,
+                ),
+                const SizedBox(height: 16),
 
-              // Categoria
-              DropdownButtonFormField<String>(
-                initialValue: _categoriaSelezionata,
-                decoration: const InputDecoration(labelText: 'Categoria*'),
-                items: Ricette.categorie.map((cat) {
-                  return DropdownMenuItem(value: cat, child: Text(cat));
-                }).toList(),
-                onChanged: (valore) => setState(() => _categoriaSelezionata = valore),
-                validator: (valore) => valore == null ? 'Seleziona una categoria' : null,
-              ),
-              const SizedBox(height: 16),
+                // Categoria
+                DropdownButtonFormField<String>(
+                  initialValue: _categoriaSelezionata,
+                  decoration: const InputDecoration(labelText: 'Categoria*'),
+                  items: Ricette.categorie.map((cat) {
+                    return DropdownMenuItem(value: cat, child: Text(cat));
+                  }).toList(),
+                  onChanged: (valore) =>
+                      setState(() => _categoriaSelezionata = valore),
+                  validator: (valore) =>
+                      valore == null ? 'Seleziona una categoria' : null,
+                ),
+                const SizedBox(height: 16),
 
-              // Preparazione
-              TextFormField(
-                controller: _preparazioneController,
-                decoration: const InputDecoration(labelText: 'Preparazione*'),
-                maxLines: 3,
-                validator: (valore) => (valore == null || valore.isEmpty) ? 'Inserisci una preparazione' : null,
-              ),
-              const SizedBox(height: 16),
+                // Tempo di preparazione
+                TextFormField(
+                  controller: _tempoPreparazioneController,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(
+                    labelText: 'Tempo di preparazione* (minuti)',
+                  ),
+                  validator: (valore) => (valore == null || valore.isEmpty)
+                      ? 'Inserisci il tempo di preparazione in minuti'
+                      : null,
+                ),
+                const SizedBox(height: 16),
 
-              // Ingredienti
-              const Text('Ingredienti*', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-              const SizedBox(height: 8),
-              ...List.generate(_ingredientiControllers.length, (index) {
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 8.0),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: TextFormField(
-                          controller: _ingredientiControllers[index],
-                          decoration: InputDecoration(
-                            hintText: 'Es. 200g Farina',
-                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                          ),
-                          validator: (valore) {
-                            if (index == 0 && (valore == null || valore.trim().isEmpty)) {
-                              return 'Inserisci almeno un ingrediente';
-                            }
-                            return null;
-                          },
-                        ),
+                // Difficoltà
+                const Text(
+                  'Difficoltà*',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: List.generate(5, (index) {
+                    return IconButton(
+                      icon: Icon(
+                        Icons.local_fire_department,
+                        color: index < _difficoltaSelezionata
+                            ? Colors.orange
+                            : Colors.grey.shade300,
+                        size: 32,
                       ),
-                      if (_ingredientiControllers.length > 1)
-                        IconButton(
-                          icon: const Icon(Icons.remove_circle_outline, color: Colors.red),
-                          onPressed: () => _rimuoviIngrediente(index),
+                      onPressed: () {
+                        setState(() {
+                          _difficoltaSelezionata = index + 1;
+                        });
+                      },
+                    );
+                  }),
+                ),
+                const SizedBox(height: 16),
+
+                // Quantità
+                TextFormField(
+                  controller: _quantitaController,
+                  decoration: const InputDecoration(
+                    labelText: 'Quantità* (es. 2 porzioni)',
+                  ),
+                  validator: (valore) => (valore == null || valore.isEmpty)
+                      ? 'Inserisci la quantità o il numero di porzioni'
+                      : null,
+                ),
+                const SizedBox(height: 16),
+
+                // Preparazione
+                TextFormField(
+                  controller: _preparazioneController,
+                  decoration: const InputDecoration(
+                    labelText: 'Procedimento (Preparazione)*',
+                  ),
+                  maxLines: 3,
+                  validator: (valore) => (valore == null || valore.isEmpty)
+                      ? 'Inserisci il procedimento'
+                      : null,
+                ),
+                const SizedBox(height: 16),
+
+                // Note
+                TextFormField(
+                  controller: _noteController,
+                  decoration: const InputDecoration(
+                    labelText: 'Note (Opzionale)',
+                  ),
+                  maxLines: 2,
+                ),
+                const SizedBox(height: 16),
+
+                // Ingredienti
+                const Text(
+                  'Ingredienti*',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+                const SizedBox(height: 8),
+                ...List.generate(_ingredientiRighe.length, (index) {
+                  final riga = _ingredientiRighe[index];
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 8.0),
+                    child: Row(
+                      children: [
+                        // Nome
+                        Expanded(
+                          flex: 3,
+                          child: TextFormField(
+                            controller: riga.nomeCtrl,
+                            decoration: InputDecoration(
+                              hintText: 'Nome (es. Farina)',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 8,
+                              ),
+                            ),
+                            validator: (valore) {
+                              if (index == 0 &&
+                                  (valore == null || valore.trim().isEmpty)) {
+                                return 'Inserisci nome';
+                              }
+                              return null;
+                            },
+                          ),
                         ),
-                    ],
+                        const SizedBox(width: 8),
+                        // Quantità
+                        Expanded(
+                          flex: 2,
+                          child: TextFormField(
+                            controller: riga.quantitaCtrl,
+                            keyboardType: TextInputType.number,
+                            decoration: InputDecoration(
+                              hintText: 'Q.tà',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 8,
+                              ),
+                            ),
+                            validator: (valore) {
+                              if (riga.nomeCtrl.text.isNotEmpty &&
+                                  (valore == null || valore.trim().isEmpty)) {
+                                return 'Obbligatorio';
+                              }
+                              if (valore != null &&
+                                  valore.isNotEmpty &&
+                                  double.tryParse(valore) == null &&
+                                  riga.unitaMisura != 'q.b.') {
+                                return 'Numero';
+                              }
+                              return null;
+                            },
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        // Unità
+                        Expanded(
+                          flex: 2,
+                          child: DropdownButtonFormField<String>(
+                            value: riga.unitaMisura,
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 8,
+                              ),
+                            ),
+                            isExpanded: true,
+                            items:
+                                [
+                                  'g',
+                                  'kg',
+                                  'ml',
+                                  'L',
+                                  'pz',
+                                  'cucchiai',
+                                  'q.b.',
+                                  'fette',
+                                  'spicchio',
+                                  'cespo',
+                                  'tazza',
+                                  'foglie',
+                                  'costa',
+                                  'bustina',
+                                  'altro',
+                                ].map((u) {
+                                  return DropdownMenuItem(
+                                    value: u,
+                                    child: Text(
+                                      u,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  );
+                                }).toList(),
+                            onChanged: (val) {
+                              if (val != null)
+                                setState(() => riga.unitaMisura = val);
+                            },
+                          ),
+                        ),
+                        if (_ingredientiRighe.length > 1)
+                          IconButton(
+                            icon: const Icon(
+                              Icons.remove_circle_outline,
+                              color: Colors.red,
+                            ),
+                            onPressed: () => _rimuoviIngrediente(index),
+                          ),
+                      ],
+                    ),
+                  );
+                }),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.grey.shade200,
+                      foregroundColor: Colors.black,
+                      shape: const StadiumBorder(), // Bottone ovale
+                    ),
+                    onPressed: _aggiungiIngrediente,
+                    icon: const Icon(Icons.add),
+                    label: const Text('Aggiungi'),
                   ),
-                );
-              }),
-              Align(
-                alignment: Alignment.centerRight,
-                child: ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.grey.shade200,
-                    foregroundColor: Colors.black,
-                    shape: const StadiumBorder(), // Bottone ovale
-                  ),
-                  onPressed: _aggiungiIngrediente,
-                  icon: const Icon(Icons.add),
-                  label: const Text('Aggiungi'),
                 ),
-              ),
-              const SizedBox(height: 40),
+                const SizedBox(height: 40),
 
-              // Bottone Salva
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black, // Uniformato con piano_pasti
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  ),
-                  onPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      // Estrapoliamo i testi dai controller degli ingredienti
-                      List<String> listaIngredienti = _ingredientiControllers
-                          .map((c) => c.text.trim())
-                          .where((i) => i.isNotEmpty)
-                          .toList();
+                // Bottone Salva
+                SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor:
+                          Colors.black, // Uniformato con piano_pasti
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        // Estrapoliamo i testi dai controller degli ingredienti
+                        List<Ingrediente> listaIngredienti = _ingredientiRighe
+                            .where((r) => r.nomeCtrl.text.trim().isNotEmpty)
+                            .map(
+                              (r) => Ingrediente(
+                                nome: r.nomeCtrl.text.trim(),
+                                quantita: r.quantitaCtrl.text.trim(),
+                                unitaMisura: r.unitaMisura,
+                              ),
+                            )
+                            .toList();
 
-                      if (listaIngredienti.isEmpty) {
+                        if (listaIngredienti.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                'Inserisci almeno un ingrediente valido',
+                              ),
+                            ),
+                          );
+                          return;
+                        }
+
+                        if (eModalitaModifica) {
+                          final ricettaAggiornata = widget.ricetta!.copia(
+                            titolo: _titoloController.text,
+                            preparazione: _preparazioneController.text,
+                            categoria: _categoriaSelezionata!,
+                            tempoPreparazione:
+                                _tempoPreparazioneController.text,
+                            difficolta: _difficoltaSelezionata,
+                            quantita: _quantitaController.text,
+                            note: _noteController.text,
+                            ingredienti: listaIngredienti,
+                          );
+                          viewModel.modificaRicettaCompleta(ricettaAggiornata);
+                        } else {
+                          final nuovaRicetta = Ricette(
+                            id: DateTime.now().millisecondsSinceEpoch
+                                .toString(),
+                            titolo: _titoloController.text,
+                            preparazione: _preparazioneController.text,
+                            categoria: _categoriaSelezionata!,
+                            tempoPreparazione:
+                                _tempoPreparazioneController.text,
+                            difficolta: _difficoltaSelezionata,
+                            quantita: _quantitaController.text,
+                            note: _noteController.text,
+                            ingredienti: listaIngredienti,
+                          );
+                          viewModel.aggiungiRicetta(nuovaRicetta);
+                        }
+
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Inserisci almeno un ingrediente valido')),
+                          const SnackBar(
+                            content: Text('Ricetta salvata con successo!'),
+                            backgroundColor: Colors.green,
+                          ),
                         );
-                        return;
-                      }
 
-                      if (eModalitaModifica) {
-                        final ricettaAggiornata = widget.ricetta!.copia(
-                          titolo: _titoloController.text,
-                          preparazione: _preparazioneController.text,
-                          categoria: _categoriaSelezionata!,
-                          ingredienti: listaIngredienti,
-                        );
-                        viewModel.modificaRicettaCompleta(ricettaAggiornata);
-                      } else {
-                        final nuovaRicetta = Ricette(
-                          id: DateTime.now().millisecondsSinceEpoch.toString(),
-                          titolo: _titoloController.text,
-                          preparazione: _preparazioneController.text,
-                          categoria: _categoriaSelezionata!,
-                          ingredienti: listaIngredienti,
-                        );
-                        viewModel.aggiungiRicetta(nuovaRicetta);
+                        Navigator.pop(context);
                       }
-
-                      Navigator.pop(context);
-                    }
-                  },
-                  child: Text(eModalitaModifica ? 'Salva modifiche' : 'Salva ricetta', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                    },
+                    child: Text(
+                      eModalitaModifica ? 'Salva modifiche' : 'Salva ricetta',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-
-            ],
+              ],
+            ),
           ),
         ),
       ),
