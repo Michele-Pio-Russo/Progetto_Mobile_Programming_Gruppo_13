@@ -21,7 +21,7 @@ class StatisticheView extends StatelessWidget {
     final ricette = ricetteVM.ricette;       // Tutte le ricette salvate
     final articoli = dispensaVM.articoli;    // Tutti gli ingredienti presenti in dispensa
     
-    // 1. Ricette per categoria e calcolo della categoria più usata
+    // Ricette per categoria e calcolo della categoria più usata
     final catMap = <String, int>{}; // Mappa {NomeCategoria: Conteggio}
     for (final r in ricette) {
       catMap[r.categoria] = (catMap[r.categoria] ?? 0) + 1;
@@ -35,7 +35,7 @@ class StatisticheView extends StatelessWidget {
       categoriaPiuUsata = entries.first.key; 
     }
 
-    // 2. Tempo medio di preparazione
+    // Tempo medio di preparazione
     double avgPrepTime = 0; // In minuti
     if (ricette.isNotEmpty) {
       double totalTime = 0;
@@ -45,7 +45,7 @@ class StatisticheView extends StatelessWidget {
       avgPrepTime = totalTime / ricette.length;
     }
 
-    // 3. Ingredienti più usati nelle ricette salvate
+    // Ingredienti più usati nelle ricette salvate
     final ingMap = <String, int>{}; // Mappa {NomeIngrediente: Conteggio}
     for (final r in ricette) {
       for (final ing in r.ingredienti) {
@@ -57,10 +57,10 @@ class StatisticheView extends StatelessWidget {
       ..sort((a, b) => b.value.compareTo(a.value));
     final top5 = topIngredients.take(5).toList();
 
-    // 4. Pasti pianificati nella settimana corrente
+    // Pasti pianificati nella settimana corrente
     final weeklyMealsCount = pianoPastiVM.numeroPastiPianificati;
 
-    // 5. Prodotti in scadenza nei prossimi 7 giorni
+    // Prodotti in scadenza nei prossimi 7 giorni
     final oggi = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
     
     final expiringItems = articoli.where((art) {
@@ -72,7 +72,7 @@ class StatisticheView extends StatelessWidget {
       return false;
     }).toList();
 
-    // 6. Ingredienti mancanti rispetto al piano pasti odierno
+    // Ingredienti mancanti rispetto al piano pasti odierno
     final dayOfWeek = _getGiornoOdierno();
     final pastiOggi = pianoPastiVM.pastiEffettivi.where((p) => p.giorno == dayOfWeek).toList();
     
@@ -148,7 +148,6 @@ class StatisticheView extends StatelessWidget {
 
             const SizedBox(height: 24),
 
-            // --- STATISTICHE DETTAGLIATE ---
             Text(
               'Statistiche dettagliate',
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
