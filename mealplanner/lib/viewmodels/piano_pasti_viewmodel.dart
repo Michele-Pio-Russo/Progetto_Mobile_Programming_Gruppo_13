@@ -1,10 +1,19 @@
 import 'package:flutter/material.dart';
 import '../models/piano_pasti_model.dart';
+import '../servizi/salvataggio_piano_pasti.dart';
 
 class PianoPastiViewModel extends ChangeNotifier {
 
   // I pasti useranno ID basati sulla data reale per gestire infinite settimane
   final List<PianoPasti> _pasti = [];
+
+  // Istanza del servizio per il salvataggio
+  final ServizioPreferenzePianoPasti _servizio = ServizioPreferenzePianoPasti();
+
+  // Costruttore
+  PianoPastiViewModel() {
+    _inizializzaDati();
+  }
 
   // Metodo get usato dalla View per leggere i pasti
   List<PianoPasti> get pasti => _pasti;
@@ -16,6 +25,19 @@ class PianoPastiViewModel extends ChangeNotifier {
   // Restituisce solo i pasti effettivamente pianificati per generare la spesa
   List<PianoPasti> get pastiEffettivi =>
       _pasti.where((p) => p.idRicetta != '-').toList();
+
+  // Inizializza i dati caricandoli dalla memoria locale.
+  Future<void> _inizializzaDati() async {
+    final datiSalvati = await _servizio.caricaPasti();
+    _pasti.clear();
+    _pasti.addAll(datiSalvati);
+    notifyListeners();
+  }
+
+  // Metodo privato per salvare la lista corrente su SharedPreferences
+  Future<void> _salvaSuDisco() async {
+    await _servizio.salvaPasti(_pasti);
+  }
 
   // Funzione per i requisiti di aggiunta e modifica
   void salvaPasto(
@@ -51,6 +73,7 @@ class PianoPastiViewModel extends ChangeNotifier {
       );
     }
     // Segnalazione alla View
+    _salvaSuDisco();
     notifyListeners();
   }
 
@@ -69,7 +92,8 @@ class PianoPastiViewModel extends ChangeNotifier {
         idRicetta: '-', // Eliminiamo il collegamento con la ricetta
       );
 
-      // Notifichiamo alla View la rimozione
+      // Notifichiamo alla View la rimozione e salviamo su disco
+      _salvaSuDisco();
       notifyListeners();
     }
   }
@@ -93,6 +117,9 @@ class PianoPastiViewModel extends ChangeNotifier {
       }
     }
     // Notifichiamo alla View se abbiamo modificato qualcosa
-    if (modificato) notifyListeners();
+    if (modificato) {
+      _salvaSuDisco();
+      notifyListeners();
+    }
   }
 }

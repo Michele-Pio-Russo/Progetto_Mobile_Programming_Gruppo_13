@@ -1,9 +1,31 @@
 import 'package:flutter/material.dart';
 import '../models/lista_spesa_model.dart';
+import '../servizi/salvataggio_lista_spesa.dart';
 
 // Estende ChangeNotifier per poter notificare la UI quando i dati cambiano
 class ListaSpesaViewModel extends ChangeNotifier {
   final List<ListaSpesa> _prodotti = [];
+  
+  // Istanza del servizio per il salvataggio
+  final ServizioPreferenzeListaSpesa _servizio = ServizioPreferenzeListaSpesa();
+
+  // Costruttore
+  ListaSpesaViewModel() {
+    _inizializzaDati();
+  }
+
+  // Inizializza i dati caricandoli dalla memoria locale.
+  Future<void> _inizializzaDati() async {
+    final datiSalvati = await _servizio.caricaArticoli();
+    _prodotti.clear();
+    _prodotti.addAll(datiSalvati);
+    notifyListeners();
+  }
+
+  // Metodo privato per salvare la lista corrente su SharedPreferences
+  Future<void> _salvaSuDisco() async {
+    await _servizio.salvaArticoli(_prodotti);
+  }
 
   List<ListaSpesa> get prodotti => _prodotti;
 
@@ -17,12 +39,14 @@ class ListaSpesaViewModel extends ChangeNotifier {
 
     _prodotti.add(nuovoProdotto);
 
+    _salvaSuDisco();
     notifyListeners();
   }
 
   void rimuoviProdotto(String id) {
     // Cerchiamo nella lista e rimuoviamo l'elemento che ha esattamente quell'ID
     _prodotti.removeWhere((p) => p.id == id);
+    _salvaSuDisco();
     notifyListeners();
   }
 
@@ -34,6 +58,7 @@ class ListaSpesaViewModel extends ChangeNotifier {
     if (indice != -1) {
       // Invertiamo il suo stato
       _prodotti[indice].comprato = !_prodotti[indice].comprato;
+      _salvaSuDisco();
       notifyListeners();
     }
   }
@@ -49,6 +74,7 @@ class ListaSpesaViewModel extends ChangeNotifier {
         quantita: nuovaQuantita,
         comprato: _prodotti[indice].comprato,
       );
+      _salvaSuDisco();
       notifyListeners();
     }
   }
@@ -57,6 +83,7 @@ class ListaSpesaViewModel extends ChangeNotifier {
     _prodotti.removeWhere(
       (p) => p.comprato,
     ); // Elimina tutti quelli con comprato == true
+    _salvaSuDisco();
     notifyListeners();
   }
 
@@ -111,6 +138,7 @@ class ListaSpesaViewModel extends ChangeNotifier {
       }
     }
     // Avvisiamo l'interfaccia di aggiornarsi una sola volta alla fine.
+    _salvaSuDisco();
     notifyListeners();
   }
 }
