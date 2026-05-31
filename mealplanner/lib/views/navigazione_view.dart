@@ -6,6 +6,7 @@ import 'dispensa/dispensa_view.dart';
 import 'piano_pasti/piano_pasti_view.dart';
 import 'lista_spesa/lista_spesa_view.dart';
 import 'ricette/ricette_view.dart';
+import 'statistiche/statistiche_view.dart';
 
 class SchermataPrincipale extends StatefulWidget {
   const SchermataPrincipale({super.key});
@@ -19,10 +20,10 @@ class _SchermataPrincipaleState extends State<SchermataPrincipale> {
 
   final List<Widget> _pagine = [
     const RicetteView(),
-    const SchermataDispensa(),
     const PianoPastiView(),
     const ListaSpesaView(),
-    const Center(child: Text('Schermata Statistiche (Da implementare)')),
+    const SchermataDispensa(),
+    const StatisticheView(),
   ];
 
   @override
@@ -46,16 +47,16 @@ class _SchermataPrincipaleState extends State<SchermataPrincipale> {
             label: 'Ricette',
           ),
           BottomNavigationBarItem(
-            icon: Icon(_indiceSelezionato == 1 ? Icons.kitchen : Icons.kitchen_outlined),
-            label: 'Dispensa',
+            icon: Icon(_indiceSelezionato == 1 ? Icons.calendar_month : Icons.calendar_month_outlined),
+            label: 'Piano',
           ),
           BottomNavigationBarItem(
-            icon: Icon(_indiceSelezionato == 2 ? Icons.calendar_month : Icons.calendar_month_outlined),
-            label: 'Piano Pasti',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(_indiceSelezionato == 3 ? Icons.shopping_cart : Icons.shopping_cart_outlined),
+            icon: Icon(_indiceSelezionato == 2 ? Icons.shopping_cart : Icons.shopping_cart_outlined),
             label: 'Spesa',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(_indiceSelezionato == 3 ? Icons.kitchen : Icons.kitchen_outlined),
+            label: 'Dispensa',
           ),
           BottomNavigationBarItem(
             icon: Icon(_indiceSelezionato == 4 ? Icons.bar_chart : Icons.bar_chart_outlined),
