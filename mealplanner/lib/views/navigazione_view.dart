@@ -15,6 +15,7 @@ class SchermataPrincipale extends StatefulWidget {
   State<SchermataPrincipale> createState() => _SchermataPrincipaleState();
 }
 
+// Collega le schermate alla navigation bar, partendo dalla prima (dispensa)
 class _SchermataPrincipaleState extends State<SchermataPrincipale> {
   int _indiceSelezionato = 0;
 
@@ -26,6 +27,7 @@ class _SchermataPrincipaleState extends State<SchermataPrincipale> {
     const StatisticheView(),
   ];
 
+// Setting degli indici delle schermate, stili e icone
   @override
   Widget build(BuildContext context) {
     return Scaffold(
