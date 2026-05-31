@@ -6,7 +6,10 @@ import 'ricette_modifica_view.dart';
 import 'ricette_dettaglio_view.dart';
 import '../../theme/style.dart';
 
-// Schermata principale che elenca tutte le ricette nel ricettacolo
+/// Schermata principale del Ricettario.
+/// Permette all'utente di visualizzare l'elenco di tutte le ricette,
+/// filtrarle per testo, categoria, difficoltà e tempo di preparazione,
+/// e navigare verso la schermata di dettaglio o di aggiunta/modifica.
 class RicetteView extends StatefulWidget {
   // Costruttore della schermata delle ricette
   const RicetteView({super.key});
@@ -17,49 +20,56 @@ class RicetteView extends StatefulWidget {
 
 // Classe per la gestione dello stato della schermata delle ricette
 class _RicetteViewState extends State<RicetteView> {
-  String _categoriaSelezionata =
-      'Tutte'; // Salva la categoria corrente selezionata per filtrare
-  String _queryRicerca =
-      ''; // Salva il testo cercato dall'utente nella barra in alto
-  int? _difficoltaSelezionata; // null significa che vogliamo vedere "Tutte"
-  String _tempoSelezionato = 'Tutti'; // Per filtrare il tempo (es. "< 15 min")
+  /// Categoria correntemente selezionata per il filtraggio (es. 'Primi Piatti'). 
+  /// 'Tutte' disabilita il filtro.
+  String _categoriaSelezionata = 'Tutte'; 
+  
+  /// Testo digitato dall'utente nella barra di ricerca per trovare ricette per titolo.
+  String _queryRicerca = ''; 
+  
+  /// Livello di difficoltà selezionato (da 1 a 5 fiammelle).
+  /// Se null, il filtro è disabilitato e mostra tutte le difficoltà.
+  int? _difficoltaSelezionata; 
+  
+  /// Filtro sul tempo stimato di preparazione ('Tutti', '< 15 min', '15-30 min', '> 30 min').
+  String _tempoSelezionato = 'Tutti';
 
   // Disegna l'interfaccia con la barra di ricerca, i filtri e la lista delle ricette
   @override
   Widget build(BuildContext context) {
     final viewModel = Provider.of<RicetteViewModel>(context);
 
-    // Applichiamo i filtri in sequenza: prima testo, poi categoria, difficoltà e infine il tempo
+    // Applichiamo i filtri in cascata: ogni passaggio riduce ulteriormente la lista.
 
-    // 1. Filtraggio tramite barra di ricerca testuale
+    // 1. Filtraggio testuale: cerca la query nel titolo delle ricette
     List<Ricette> ricetteFiltrate = viewModel.cercaRicette(_queryRicerca);
 
-    // 2. Filtraggio tramite categoria
+    // 2. Filtraggio per Categoria
     if (_categoriaSelezionata != 'Tutte') {
       ricetteFiltrate = ricetteFiltrate
           .where((r) => r.categoria == _categoriaSelezionata)
           .toList();
     }
 
-    // 3. Filtraggio tramite livello di difficoltà (fiammelle)
+    // 3. Filtraggio per Difficoltà
     if (_difficoltaSelezionata != null) {
       ricetteFiltrate = ricetteFiltrate
           .where((r) => r.difficolta == _difficoltaSelezionata)
           .toList();
     }
 
-    // 4. Filtraggio tramite tempo stimato
+    // 4. Filtraggio per Tempo di Preparazione (richiede il parsing della stringa in int)
     if (_tempoSelezionato != 'Tutti') {
       ricetteFiltrate = ricetteFiltrate.where((r) {
-        // Il tempo è salvato come testo (es. "20"), proviamo a convertirlo in numero per fare i confronti matematici
+        // Il tempo è salvato testualmente (es. "20"), quindi cerchiamo di convertirlo in un numero
         int tempo = int.tryParse(r.tempoPreparazione) ?? 0;
 
-        // Applichiamo i raggruppamenti del filtro
+        // Confrontiamo il tempo con le fasce selezionate
         if (_tempoSelezionato == '< 15 min') return tempo > 0 && tempo < 15;
         if (_tempoSelezionato == '15-30 min') return tempo >= 15 && tempo <= 30;
         if (_tempoSelezionato == '> 30 min') return tempo > 30;
 
-        return true; // Per fallback mostriamo la ricetta
+        return true; // Se nessuna regola corrisponde, manteniamo la ricetta per sicurezza
       }).toList();
     }
 
