@@ -21,25 +21,35 @@ class _SchermataAggiuntaSpesaState extends State<SchermataAggiuntaSpesa> {
   String _unitaSelezionata = 'pezzi';
   final List<String> _unitaMisura = ['g', 'kg', 'ml', 'l', 'pezzi', 'confezioni'];
 
+
+  // Metodo per inizializzare i campi di testo se stiamo modificando un prodotto già esistente, altrimenti rimarranno vuoti per l'inserimento di un nuovo prodotto
   @override
   void initState() {
     super.initState();
+    
+    // Se ci è stato passato un prodotto, significa che siamo in modalità modifica
+    // Dobbiamo quindi precompilare i campi di testo con i dati attuali
     if (widget.prodotto != null) {
       _nomeController.text = widget.prodotto!.nome;
+      
+      // Spezziamo la stringa in due usando lo spazio come separatore per poter riempire correttamente sia il campo numerico che la tendina dell'unità
       if (widget.prodotto!.quantita != '-') {
         final parti = widget.prodotto!.quantita.split(' ');
+        
         if (parti.length >= 2) {
-          _quantitaController.text = parti[0];
+          _quantitaController.text = parti[0]; 
+          // Verifichiamo che l'unità sia tra quelle disponibili prima di selezionarla
           if (_unitaMisura.contains(parti[1])) {
             _unitaSelezionata = parti[1];
           }
         } else if (parti.length == 1) {
-          _quantitaController.text = parti[0];
+          _quantitaController.text = parti[0]; // C'era solo il numero
         }
       }
     }
   }
 
+  // Metodo per liberare le risorse occupate dai controller quando la pagina viene chiusa
   @override
   void dispose() {
     _nomeController.dispose();
@@ -56,6 +66,7 @@ class _SchermataAggiuntaSpesaState extends State<SchermataAggiuntaSpesa> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
+        // Adattiamo il titolo in base a cosa stiamo facendo
         title: Text(
           widget.prodotto == null ? 'Nuovo prodotto' : 'Modifica prodotto',
           style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
@@ -97,6 +108,8 @@ class _SchermataAggiuntaSpesaState extends State<SchermataAggiuntaSpesa> {
                       TextField(
                         controller: _quantitaController,
                         keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                        // Usiamo una regex per impedire l'inserimento di testo normale. 
+                        // Permettiamo solo numeri ed eventualmente un punto o una virgola.
                         inputFormatters: [
                           FilteringTextInputFormatter.allow(RegExp(r'^\d*[\.,]?\d*')),
                         ],
@@ -165,19 +178,27 @@ class _SchermataAggiuntaSpesaState extends State<SchermataAggiuntaSpesa> {
                 ),
                 onPressed: () {
                   String nome = _nomeController.text.trim();
+                  
+                  // Sostituiamo eventuali virgole con il punto per standardizzare il formato decimale e non avere problemi di formattazione dopo
                   String numeroQuantita = _quantitaController.text.trim().replaceAll(',', '.');
 
+                  // Procediamo al salvataggio solo se l'utente ha inserito almeno il nome
                   if (nome.isNotEmpty) {
                     String quantitaFinale = '-';
+                    
                     if (numeroQuantita.isNotEmpty) {
                       quantitaFinale = '$numeroQuantita $_unitaSelezionata';
                     }
 
+                    // Se non c'era un prodotto iniziale creiamo un nuovo record, 
+                    // altrimenti andiamo ad aggiornare quello esistente usando il suo ID.
                     if (widget.prodotto == null) {
                       viewModel.aggiungiProdotto(nome, quantitaFinale);
                     } else {
                       viewModel.modificaProdotto(widget.prodotto!.id, nome, quantitaFinale);
                     }
+                    
+                    // Chiudiamo la pagina e torniamo alla lista
                     Navigator.pop(context);
                   }
                 },

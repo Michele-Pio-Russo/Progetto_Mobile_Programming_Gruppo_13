@@ -5,7 +5,7 @@ import 'package:intl/date_symbol_data_local.dart';
 
 import '../../viewmodels/piano_pasti_viewmodel.dart';
 import '../../models/piano_pasti_model.dart';
-import 'piano_pasti_modifica_view.dart';
+import 'piano_pasti_modifica_view.dart'; // <-- Assicurati che questo file si chiami così nel tuo progetto!
 
 import '../ricette/ricette_dettaglio_view.dart';
 import '../../models/ricette_model.dart';
@@ -23,8 +23,11 @@ class _PianoPastiViewState extends State<PianoPastiView> {
   @override
   void initState() {
     super.initState();
+    // Inizializza la lingua per le date in modo da mostrare "Lunedì" invece di "Monday"
     initializeDateFormatting('it_IT', null);
+    
     DateTime ora = DateTime.now();
+    // Calcolo matematico elegante per trovare infallibilmente il Lunedì della settimana in corso.
     _inizioSettimana = ora.subtract(Duration(days: ora.weekday - 1));
     _inizioSettimana = DateTime(_inizioSettimana.year, _inizioSettimana.month, _inizioSettimana.day);
   }
@@ -70,6 +73,7 @@ class _PianoPastiViewState extends State<PianoPastiView> {
           ),
         ],
       ),
+      // Il Consumer avvolge l'interfaccia: ottimizza le prestazioni ridisegnando solo questa parte
       body: Consumer<PianoPastiViewModel>(
         builder: (context, viewModel, child) {
           return Column(
@@ -186,83 +190,50 @@ class _PianoPastiViewState extends State<PianoPastiView> {
                                           builder: (BuildContext context) {
                                             return SafeArea(
                                               child: Padding(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                  vertical: 16.0,
-                                                ),
+                                                padding: const EdgeInsets.symmetric(vertical: 16.0),
                                                 child: Column(
-                                                  mainAxisSize:
-                                                      MainAxisSize.min,
+                                                  mainAxisSize: MainAxisSize.min,
                                                   children: [
                                                     Padding(
-                                                      padding:
-                                                          const EdgeInsets.only(
-                                                        bottom: 16.0,
-                                                      ),
+                                                      padding: const EdgeInsets.only(bottom: 16.0),
                                                       child: Text(
                                                         'Modifica pasti di $giornoCorrente',
                                                         style: const TextStyle(
                                                           fontSize: 18,
-                                                          fontWeight:
-                                                              FontWeight.bold,
+                                                          fontWeight: FontWeight.bold,
                                                         ),
                                                       ),
                                                     ),
-                                                    ...PianoPasti.tipologie.map((
-                                                      tipologia,
-                                                    ) {
-                                                      var pastoDaModificare =
-                                                          pastiDelGiorno.firstWhere(
-                                                            (p) =>
-                                                                p.tipologia ==
-                                                                tipologia,
-                                                            orElse: () =>
-                                                                PianoPasti(
-                                                                  id: '',
-                                                                  giorno:
-                                                                      giornoCorrente,
-                                                                  tipologia:
-                                                                      tipologia,
-                                                                  nomeRicetta:
-                                                                      '-',
-                                                                  idRicetta:
-                                                                      '-',
-                                                                ),
-                                                          );
+                                                    ...PianoPasti.tipologie.map((tipologia) {
+                                                      var pastoDaModificare = pastiDelGiorno.firstWhere(
+                                                        (p) => p.tipologia == tipologia,
+                                                        orElse: () => PianoPasti(
+                                                          id: '',
+                                                          giorno: giornoCorrente,
+                                                          tipologia: tipologia,
+                                                          nomeRicetta: '-',
+                                                          idRicetta: '-',
+                                                        ),
+                                                      );
 
                                                       return ListTile(
-                                                        leading: const Icon(
-                                                          Icons.edit,
-                                                          color: Colors.grey,
-                                                        ),
+                                                        leading: const Icon(Icons.edit, color: Colors.grey),
                                                         title: Text(
                                                           tipologia,
-                                                          style:
-                                                              const TextStyle(
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                              ),
+                                                          style: const TextStyle(fontWeight: FontWeight.bold),
                                                         ),
                                                         subtitle: Text(
-                                                          pastoDaModificare
-                                                                      .nomeRicetta ==
-                                                                  '-'
+                                                          pastoDaModificare.nomeRicetta == '-'
                                                               ? 'Nessuna ricetta'
-                                                              : pastoDaModificare
-                                                                  .nomeRicetta,
+                                                              : pastoDaModificare.nomeRicetta,
                                                         ),
                                                         onTap: () {
-                                                          Navigator.pop(
-                                                            context,
-                                                          );
+                                                          Navigator.pop(context);
                                                           Navigator.push(
                                                             context,
                                                             MaterialPageRoute(
-                                                              builder: (context) =>
-                                                                  SchermataModificaPianoPasti(
-                                                                pasto:
-                                                                    pastoDaModificare,
+                                                              builder: (context) => SchermataModificaPianoPasti(
+                                                                pasto: pastoDaModificare,
                                                               ),
                                                             ),
                                                           );
@@ -295,9 +266,7 @@ class _PianoPastiViewState extends State<PianoPastiView> {
                               );
 
                               return Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 4.0,
-                                ),
+                                padding: const EdgeInsets.symmetric(vertical: 4.0),
                                 child: Row(
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
@@ -315,9 +284,7 @@ class _PianoPastiViewState extends State<PianoPastiView> {
                                       child: Text(
                                         pasto.nomeRicetta,
                                         style: TextStyle(
-                                          color: pasto.nomeRicetta == '-'
-                                              ? Colors.grey
-                                              : Colors.black87,
+                                          color: pasto.nomeRicetta == '-' ? Colors.grey : Colors.black87,
                                           fontSize: 14,
                                         ),
                                       ),

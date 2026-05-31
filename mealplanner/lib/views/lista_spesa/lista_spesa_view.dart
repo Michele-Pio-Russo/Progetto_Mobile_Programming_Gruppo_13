@@ -6,9 +6,10 @@ import 'package:intl/date_symbol_data_local.dart';
 import '../../viewmodels/lista_spesa_viewmodel.dart';
 import '../../viewmodels/piano_pasti_viewmodel.dart';
 import '../../viewmodels/ricette_viewmodel.dart';
-import '../../viewmodels/dispensa_viewmodel.dart'; 
+import '../../viewmodels/dispensa_viewmodel.dart';
 import 'lista_spesa_aggiunta_view.dart';
 
+// Usiamo uno StatefulWidget perché dobbiamo tenere in memoria la data che l'utente seleziona dal calendario
 class ListaSpesaView extends StatefulWidget {
   const ListaSpesaView({super.key});
 
@@ -22,21 +23,31 @@ class _ListaSpesaViewState extends State<ListaSpesaView> {
   @override
   void initState() {
     super.initState();
+    // Prepariamo la formattazione della data in italiano 
     initializeDateFormatting('it_IT', null);
     _dataSelezionata = DateTime.now();
   }
 
-  void _mostraDialogConferma(BuildContext context, ListaSpesaViewModel viewModel) {
+  // Mostra un popup di sicurezza prima di cancellare tutti gli articoli già messi nel carrello
+  void _mostraDialogConferma(
+    BuildContext context,
+    ListaSpesaViewModel viewModel,
+  ) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Conferma rimozione'),
-          content: const Text('Vuoi davvero rimuovere tutti gli articoli marcati come comprati?'),
+          content: const Text(
+            'Vuoi davvero rimuovere tutti gli articoli marcati come comprati?',
+          ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Annulla', style: TextStyle(color: Colors.grey)),
+              child: const Text(
+                'Annulla',
+                style: TextStyle(color: Colors.grey),
+              ),
             ),
             TextButton(
               onPressed: () {
@@ -51,8 +62,11 @@ class _ListaSpesaViewState extends State<ListaSpesaView> {
     );
   }
 
+  // Gestisce il processo di lettura delle ricette del giorno e aggiunta degli ingredienti mancanti alla lista
   void _mostraDialogConfermaGenerazione(BuildContext context) {
-    final giorniSettimana = ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica'];
+    final giorniSettimana = [
+      'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica',
+    ];
     final giornoNome = giorniSettimana[_dataSelezionata.weekday - 1];
 
     showDialog(
@@ -60,30 +74,56 @@ class _ListaSpesaViewState extends State<ListaSpesaView> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Genera da Piano Pasti'),
-          content: Text('Vuoi generare gli articoli mancanti confrontando le ricette di $giornoNome con la tua dispensa?'),
+          content: Text(
+            'Vuoi generare gli articoli mancanti confrontando le ricette di $giornoNome con la tua dispensa?',
+          ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Annulla', style: TextStyle(color: Colors.grey)),
+              child: const Text(
+                'Annulla',
+                style: TextStyle(color: Colors.grey),
+              ),
             ),
             TextButton(
               onPressed: () {
+                // Recuperiamo i dati dai ViewModel
+                // Usiamo listen: false perché siamo dentro a un'azione (il click di un bottone)
+                // e stiamo solo eseguendo un calcolo, non dobbiamo aggiornare la grafica in questo esatto punto.
                 final pianoPastiVM = Provider.of<PianoPastiViewModel>(context, listen: false);
                 final ricetteVM = Provider.of<RicetteViewModel>(context, listen: false);
                 final dispensaVM = Provider.of<GestoreDispensa>(context, listen: false);
                 final listaSpesaVM = Provider.of<ListaSpesaViewModel>(context, listen: false);
 
-                final pastiOggi = pianoPastiVM.pasti.where((p) => p.giorno == giornoNome).toList();
+                // Isoliamo solo i pasti che l'utente ha pianificato per il giorno che sta visualizzando
+                final pastiOggi = pianoPastiVM.pasti
+                    .where((p) => p.giorno == giornoNome)
+                    .toList();
 
-                listaSpesaVM.generaDaPianoPasti(pastiOggi, ricetteVM, dispensaVM.articoli);
+                listaSpesaVM.generaDaPianoPasti(
+                  pastiOggi,
+                  ricetteVM,
+                  dispensaVM.articoli,
+                );
 
                 Navigator.pop(context);
 
+                // Mostriamo un piccolo banner in basso per confermare all'utente che l'operazione è andata a buon fine
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Lista aggiornata con gli ingredienti di $giornoNome mancanti!')),
+                  SnackBar(
+                    content: Text(
+                      'Lista aggiornata con gli ingredienti di $giornoNome mancanti!',
+                    ),
+                  ),
                 );
               },
-              child: const Text('Genera', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+              child: const Text(
+                'Genera',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ],
         );
@@ -103,11 +143,18 @@ class _ListaSpesaViewState extends State<ListaSpesaView> {
           children: [
             const Text(
               'Lista della Spesa',
-              style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
             ),
             Text(
               DateFormat('EEEE d MMMM yyyy', 'it_IT').format(_dataSelezionata),
-              style: const TextStyle(fontSize: 12, color: Colors.grey, fontWeight: FontWeight.w500),
+              style: const TextStyle(
+                fontSize: 12,
+                color: Colors.grey,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ],
         ),
@@ -117,6 +164,7 @@ class _ListaSpesaViewState extends State<ListaSpesaView> {
           IconButton(
             icon: const Icon(Icons.calendar_today_outlined, color: Colors.black),
             onPressed: () async {
+              // Apre il calendario di sistema per far scegliere una data
               DateTime? scelta = await showDatePicker(
                 context: context,
                 initialDate: _dataSelezionata,
@@ -134,6 +182,7 @@ class _ListaSpesaViewState extends State<ListaSpesaView> {
             icon: const Icon(Icons.bolt, color: Colors.black),
             onPressed: () => _mostraDialogConfermaGenerazione(context),
           ),
+          // Usiamo un Consumer per il bottone del cestino: vogliamo che appaia solo se c'è almeno un prodotto già spuntato, altrimenti lo nascondiamo
           Consumer<ListaSpesaViewModel>(
             builder: (context, viewModel, child) {
               final haProdottiComprati = viewModel.prodotti.any((p) => p.comprato);
@@ -162,6 +211,7 @@ class _ListaSpesaViewState extends State<ListaSpesaView> {
         shape: const CircleBorder(side: BorderSide(color: Colors.white30)),
         child: const Icon(Icons.add, size: 28),
       ),
+      // Questo Consumer ascolta ListaSpesaViewModel e ridisegna solo il corpo della pagina quando i prodotti cambiano
       body: Consumer<ListaSpesaViewModel>(
         builder: (context, viewModel, child) {
           if (viewModel.prodotti.isEmpty) {
@@ -198,6 +248,7 @@ class _ListaSpesaViewState extends State<ListaSpesaView> {
                     prodotto.nome,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
+                      // Sbarriamo il testo per dare un effetto visivo da lista cartacea spuntata
                       decoration: prodotto.comprato
                           ? TextDecoration.lineThrough
                           : TextDecoration.none,
@@ -216,10 +267,12 @@ class _ListaSpesaViewState extends State<ListaSpesaView> {
                       IconButton(
                         icon: const Icon(Icons.edit_outlined, color: Colors.grey),
                         onPressed: () {
+                          // Passiamo l'oggetto prodotto intero alla schermata, in questo modo i campi di testo saranno già precompilati con i dati vecchi da modificare
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => SchermataAggiuntaSpesa(prodotto: prodotto),
+                              builder: (context) =>
+                                  SchermataAggiuntaSpesa(prodotto: prodotto),
                             ),
                           );
                         },

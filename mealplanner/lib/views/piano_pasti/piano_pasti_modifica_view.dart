@@ -6,6 +6,9 @@ import '../../viewmodels/ricette_viewmodel.dart';
 import '../../models/piano_pasti_model.dart';
 import '../../models/ricette_model.dart';
 
+// StatefulWidget è necessario perché questa schermata gestisce uno stato locale cioè 
+// le selezioni dell'utente nei menu a tendina (giorno, tipologia, ricetta) cambiano nel tempo
+// e l'interfaccia si deve aggiornare per mostrarle
 class SchermataModificaPianoPasti extends StatefulWidget {
   final PianoPasti? pasto;
 
@@ -18,14 +21,20 @@ class SchermataModificaPianoPasti extends StatefulWidget {
 
 class _SchermataModificaPianoPastiState
     extends State<SchermataModificaPianoPasti> {
+  
+  // Variabili di stato interne per tenere traccia delle scelte correnti dell'utente
+  // Sono nullable (?) perché all'inizio potrebbero non essere state ancora scelte
   String? _giornoSelezionato;
   String? _tipologiaSelezionata;
   String? _idRicettaSelezionata;
 
+  // initState() viene chiamato una sola volta quando la schermata viene creata.
   @override
   void initState() {
     super.initState();
+    
     if (widget.pasto != null) {
+      // Controlliamo che il giorno non sia una stringa vuota prima di assegnarlo, 
       _giornoSelezionato = widget.pasto!.giorno.isNotEmpty
           ? widget.pasto!.giorno
           : null;
@@ -34,12 +43,14 @@ class _SchermataModificaPianoPastiState
           ? widget.pasto!.tipologia
           : null;
 
+      // Ignoriamo se è vuota
       if (widget.pasto!.idRicetta != '-') {
         _idRicettaSelezionata = widget.pasto!.idRicetta;
       }
     }
   }
 
+  // Una funzione separata per gestire il popup di conferma eliminazione. 
   void _mostraConfermaEliminazione(
     BuildContext context,
     PianoPastiViewModel viewModel,
@@ -49,6 +60,7 @@ class _SchermataModificaPianoPastiState
       builder: (BuildContext ctx) {
         return AlertDialog(
           title: const Text('Rimuovere pasto?'),
+          // Usiamo l'interpolazione delle stringhe (${...}) per rendere il messaggio dinamico e chiaro per l'utente.
           content: Text(
             'Sei sicuro di voler rimuovere la ricetta dal ${widget.pasto!.tipologia} di ${widget.pasto!.giorno}?',
           ),
@@ -57,7 +69,7 @@ class _SchermataModificaPianoPastiState
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(ctx),
+              onPressed: () => Navigator.pop(ctx), // Chiude solo il popup (ctx)
               child: const Text(
                 'Annulla',
                 style: TextStyle(color: Colors.grey),
@@ -66,9 +78,13 @@ class _SchermataModificaPianoPastiState
             ElevatedButton(
               style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
               onPressed: () {
+                // Logica di "Cancellazione Morbida":
+                // Costruiamo l'ID univoco della casella (es. "lun_pra" per Lunedì Pranzo)
                 String idCasella =
                     '${widget.pasto!.giorno.substring(0, 3).toLowerCase()}_${widget.pasto!.tipologia.substring(0, 3).toLowerCase()}';
 
+                 
+                // Sovrascriviamo la riga con '-'. 
                 viewModel.salvaPasto(
                   idCasella,
                   widget.pasto!.giorno,
@@ -77,8 +93,8 @@ class _SchermataModificaPianoPastiState
                   '-',
                 );
 
-                Navigator.pop(ctx);
-                Navigator.pop(context);
+                Navigator.pop(ctx);     // Chiude il popup di conferma
+                Navigator.pop(context); // Chiude la schermata di modifica e torna al calendario
               },
               child: const Text(
                 'Elimina',
@@ -91,19 +107,26 @@ class _SchermataModificaPianoPastiState
     );
   }
 
+  // Metodo per costruire l'interfaccia grafica della schermata
   @override
   Widget build(BuildContext context) {
+    // Recuperiamo i ViewModel forniti dal Provider.
     final viewModel = Provider.of<PianoPastiViewModel>(context, listen: false);
+    
+    // listen è true (di default) -> Ci serve la lista aggiornata delle ricette per il menu a tendina.
     final ricetteViewModel = Provider.of<RicetteViewModel>(context);
 
     final List<Ricette> ricetteDisponibili = ricetteViewModel.ricette;
 
+    // Se stavamo modificando un pasto che aveva una ricetta, ma nel frattempo quella ricetta 
+    // è stata cancellata dal database globale, l'ID non sarà più valido
     if (_idRicettaSelezionata != null && 
         _idRicettaSelezionata != '-' && 
         !ricetteDisponibili.any((r) => r.id == _idRicettaSelezionata)) {
       _idRicettaSelezionata = null;
     }
 
+    // Variabile booleana calcolata per capire in che modalità siamo
     final bool isAggiunta =
         widget.pasto == null || widget.pasto!.tipologia.isEmpty;
 
@@ -112,6 +135,7 @@ class _SchermataModificaPianoPastiState
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
+        // Titolo in base alla modalità
         title: Text(
           isAggiunta ? 'Aggiungi pasto' : 'Modifica ricetta',
           style: const TextStyle(
@@ -126,6 +150,9 @@ class _SchermataModificaPianoPastiState
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            
+            // Invece di avere due blocchi di codice completamente separati, inseriamo dinamicamente 
+            // una lista di widget direttamente dentro la colonna usando ...[ ]
             if (isAggiunta) ...[
               Container(
                 padding: const EdgeInsets.all(16),
@@ -152,10 +179,12 @@ class _SchermataModificaPianoPastiState
               ),
               const SizedBox(height: 24),
               const Text(
-                'Tipologia pasto',
+                'Tipologia pasto', 
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
               ),
               const SizedBox(height: 8),
+              
+              // Menu a tendina per scegliere se è Colazione, Pranzo, ecc.
               DropdownButtonFormField<String>(
                 value: _tipologiaSelezionata,
                 hint: const Text('Seleziona la tipologia'),
@@ -168,12 +197,14 @@ class _SchermataModificaPianoPastiState
                     vertical: 8,
                   ),
                 ),
+                // Mappa la lista statica PianoPasti.tipologie in elementi cliccabili del menu
                 items: PianoPasti.tipologie.map((String tipologia) {
                   return DropdownMenuItem<String>(
                     value: tipologia,
                     child: Text(tipologia),
                   );
                 }).toList(),
+                // Quando l'utente seleziona una voce, aggiorniamo lo stato interno
                 onChanged: (nuovaTipologia) {
                   setState(() {
                     _tipologiaSelezionata = nuovaTipologia;
@@ -182,6 +213,8 @@ class _SchermataModificaPianoPastiState
               ),
               const SizedBox(height: 20),
             ] else ...[
+              // Mostra un riquadro fisso con le informazioni del pasto che si sta modificando,
+              // impedendo di cambiare giorno o tipologia
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
@@ -213,6 +246,8 @@ class _SchermataModificaPianoPastiState
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
             const SizedBox(height: 8),
+            
+            // Menu a tendina per scegliere la ricetta
             DropdownButtonFormField<String>(
               value: _idRicettaSelezionata,
               hint: const Text('Tocca per scegliere una ricetta...'),
@@ -226,6 +261,7 @@ class _SchermataModificaPianoPastiState
                 ),
                 prefixIcon: const Icon(Icons.restaurant_menu),
               ),
+              // Popoliamo il menu attingendo direttamente dalla lista fornita dal RicetteViewModel
               items: ricetteDisponibili.map((Ricette ricetta) {
                 return DropdownMenuItem<String>(
                   value: ricetta.id,
@@ -240,6 +276,7 @@ class _SchermataModificaPianoPastiState
             ),
             const SizedBox(height: 40),
 
+            // Bottone di salvataggio
             SizedBox(
               width: double.infinity,
               height: 50,
@@ -254,12 +291,15 @@ class _SchermataModificaPianoPastiState
                 onPressed: () {
                   if (_giornoSelezionato == null ||
                       _tipologiaSelezionata == null) {
-                    return;
+                    return; 
                   }
 
+                  // Impostiamo valori di default (il trattino) se l'utente non seleziona nulla
                   String nomeRicettaInserita = '-';
                   String idRicettaInserita = '-';
 
+                  // Se ha scelto una ricetta, recuperiamo il nome esatto usando il ViewModel
+                  // Salviamo sia l'ID (per ritrovarla) che il Nome (per mostrarlo velocemente nel calendario)
                   if (_idRicettaSelezionata != null) {
                     final ricettaScelta = ricetteViewModel.ottieniRicettaPerId(_idRicettaSelezionata!);
                     if (ricettaScelta != null) {
@@ -268,9 +308,11 @@ class _SchermataModificaPianoPastiState
                     }
                   }
 
+                  // Generiamo la chiave univoca per lo slot nel database
                   String idCasella =
                       '${_giornoSelezionato!.substring(0, 3).toLowerCase()}_${_tipologiaSelezionata!.substring(0, 3).toLowerCase()}';
 
+                  // Salviamo
                   viewModel.salvaPasto(
                     idCasella,
                     _giornoSelezionato!,
@@ -279,6 +321,7 @@ class _SchermataModificaPianoPastiState
                     idRicettaInserita,
                   );
 
+                  // Chiudiamo la schermata e torniamo indietro
                   Navigator.pop(context);
                 },
                 child: Text(
@@ -293,10 +336,14 @@ class _SchermataModificaPianoPastiState
 
             const SizedBox(height: 16),
 
+            // Bottone di eliminazione
+            // Mostrato solo  se non stiamo aggiungendo un pasto nuovo
+            // E solo se il pasto attualmente salvato ha una ricetta vera (non il trattino)
             if (!isAggiunta && widget.pasto!.nomeRicetta != '-')
               SizedBox(
                 width: double.infinity,
                 height: 50,
+                // Correzione: reinseriti i parametri 'icon' e 'label' obbligatori per TextButton.icon
                 child: TextButton.icon(
                   style: TextButton.styleFrom(
                     foregroundColor: Colors.red,
@@ -310,6 +357,7 @@ class _SchermataModificaPianoPastiState
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   onPressed: () {
+                    // Quando l'utente clicca su "Elimina", mostriamo un popup di conferma 
                     _mostraConfermaEliminazione(context, viewModel);
                   },
                 ),

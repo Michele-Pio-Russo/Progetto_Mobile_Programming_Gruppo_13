@@ -2,18 +2,15 @@ import 'package:flutter/material.dart';
 import '../models/piano_pasti_model.dart';
 
 class PianoPastiViewModel extends ChangeNotifier {
-  // Con ChangeNotifier, possiamo avvisare la grafica quando i dati cambiano
 
-  // Creiamo e riempiamo la lista che contiene i pasti pianificati (privata, perchè c'è il trattino basso)
   final List<PianoPasti> _pasti = [
-    // Lunedì
     PianoPasti(
       id: 'lun_col',
       giorno: 'Lunedì',
       tipologia: 'Colazione',
       nomeRicetta: '-',
       idRicetta: '-',
-    ), // Se nomeRicetta è vuoto, la view non visualizzerà nulla
+    ), 
     PianoPasti(
       id: 'lun_pra',
       giorno: 'Lunedì',
@@ -78,7 +75,6 @@ class PianoPastiViewModel extends ChangeNotifier {
       nomeRicetta: 'Gelato alla Vaniglia',
       idRicetta: '9',
     ),
-    // Mercoledì
     PianoPasti(
       id: 'mer_col',
       giorno: 'Mercoledì',
@@ -150,7 +146,6 @@ class PianoPastiViewModel extends ChangeNotifier {
       nomeRicetta: '-',
       idRicetta: '-',
     ),
-    // Venerdì
     PianoPasti(
       id: 'ven_col',
       giorno: 'Venerdì',
@@ -186,7 +181,6 @@ class PianoPastiViewModel extends ChangeNotifier {
       nomeRicetta: '-',
       idRicetta: '-',
     ),
-    // Sabato
     PianoPasti(
       id: 'sab_col',
       giorno: 'Sabato',
@@ -222,7 +216,6 @@ class PianoPastiViewModel extends ChangeNotifier {
       nomeRicetta: '-',
       idRicetta: '-',
     ),
-    // Domenica
     PianoPasti(
       id: 'dom_col',
       giorno: 'Domenica',

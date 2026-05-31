@@ -3,8 +3,7 @@ class PianoPasti {
   final String id;
   final String giorno;
   final String tipologia;
-  final String
-  nomeRicetta; // Sarà il nome della ricetta, se vuoto '-' non verrà visualizzato nulla
+  final String nomeRicetta; // Sarà il nome della ricetta, se vuoto '-' non verrà visualizzato nulla
   final String idRicetta; // Per ricondursi alla ricetta dal ricettacolo
 
   // Costruttore

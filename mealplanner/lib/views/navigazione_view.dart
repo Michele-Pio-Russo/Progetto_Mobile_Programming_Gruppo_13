@@ -14,12 +14,14 @@ class SchermataPrincipale extends StatefulWidget {
 class _SchermataPrincipaleState extends State<SchermataPrincipale> {
   int _indiceSelezionato = 1;
 
-  final List<Widget> _pagine = const [
+  // Corretto: rimosso il 'const' globale prima della lista, che causava l'errore,
+  // e inserito solo sul Center che è effettiva mente una costante.
+  final List<Widget> _pagine = [
     RicetteView(),
     SchermataDispensa(),
     PianoPastiView(),
     ListaSpesaView(),
-    Center(child: Text('Schermata Statistiche (Da implementare)')),
+    const Center(child: Text('Schermata Statistiche (Da implementare)')),
   ];
 
   @override
