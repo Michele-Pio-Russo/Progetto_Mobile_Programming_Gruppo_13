@@ -5,7 +5,7 @@ import '../../viewmodels/piano_pasti_viewmodel.dart';
 import '../../viewmodels/ricette_viewmodel.dart';
 import '../../models/piano_pasti_model.dart';
 import '../../models/ricette_model.dart';
-import '../../theme/style.dart';
+import '../../theme/style.dart'; // Mantieni il tuo import di stile
 
 
 // StatefulWidget è necessario perché questa schermata gestisce uno stato locale cioè 
@@ -83,11 +83,8 @@ class _SchermataModificaPianoPastiState
                 foregroundColor: AppStyle.coloreBianco,
               ),
               onPressed: () {
-                // Logica di "Cancellazione Morbida":
-                // Costruiamo l'ID univoco della casella (es. "lun_pra" per Lunedì Pranzo)
-                String idCasella =
-                    '${widget.pasto!.giorno.substring(0, 3).toLowerCase()}_${widget.pasto!.tipologia.substring(0, 3).toLowerCase()}';
-
+                // Usiamo l'ID esatto del pasto passato dalla schermata precedente
+                String idCasella = widget.pasto!.id;
                  
                 // Sovrascriviamo la riga con '-'. 
                 viewModel.salvaPasto(
@@ -295,9 +292,11 @@ class _SchermataModificaPianoPastiState
                     }
                   }
 
-                  // Generiamo la chiave univoca per lo slot nel database
-                  String idCasella =
-                      '${_giornoSelezionato!.substring(0, 3).toLowerCase()}_${_tipologiaSelezionata!.substring(0, 3).toLowerCase()}';
+                  // Generiamo la chiave univoca: se stiamo aggiungendo, uniamo la data (id base) alla tipologia
+                  // altrimenti usiamo l'id esatto già esistente
+                  String idCasella = isAggiunta 
+                      ? '${widget.pasto!.id}_$_tipologiaSelezionata' 
+                      : widget.pasto!.id;
 
                   // Salviamo
                   viewModel.salvaPasto(

@@ -77,6 +77,7 @@ class _SchermataDispensaState extends State<SchermataDispensa> {
                 Expanded(
                   flex: 1,
                   child: DropdownButtonFormField<String>(
+                    isExpanded: true, // <-- AGGIUNTO: Impedisce l'overflow laterale
                     initialValue: _categoriaSelezionata,
                     decoration: InputDecoration(
                       border: OutlineInputBorder(
@@ -109,13 +110,18 @@ class _SchermataDispensaState extends State<SchermataDispensa> {
           // I tre Bottoni di Filtro ("Tutti", "In scadenza", "In esaurimento")
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _costruisciBottoneFiltro('Tutti'),
-                _costruisciBottoneFiltro('In scadenza'),
-                _costruisciBottoneFiltro('In esaurimento'),
-              ],
+            // <-- AGGIUNTO SingleChildScrollView: Evita errori se lo schermo è molto stretto
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  _costruisciBottoneFiltro('Tutti'),
+                  const SizedBox(width: 8),
+                  _costruisciBottoneFiltro('In scadenza'),
+                  const SizedBox(width: 8),
+                  _costruisciBottoneFiltro('In esaurimento'),
+                ],
+              ),
             ),
           ),
 

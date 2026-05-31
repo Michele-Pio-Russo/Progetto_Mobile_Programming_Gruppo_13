@@ -9,7 +9,7 @@ import 'piano_pasti_modifica_view.dart'; // <-- Assicurati che questo file si ch
 
 import '../ricette/ricette_dettaglio_view.dart';
 import '../../models/ricette_model.dart';
-import '../../theme/style.dart';
+import '../../theme/style.dart'; // Mantieni il tuo import di stile
 
 
 class PianoPastiView extends StatefulWidget {
@@ -113,8 +113,12 @@ class _PianoPastiViewState extends State<PianoPastiView> {
                     String giornoCorrente = PianoPasti.giorni[index];
                     DateTime dataGiorno = _inizioSettimana.add(Duration(days: index));
                     
+                    // Creiamo una stringa univoca per la data corrente (es. 2026_5_20)
+                    String stringaData = "${dataGiorno.year}_${dataGiorno.month}_${dataGiorno.day}";
+
+                    // Filtriamo solo i pasti che hanno nel loro ID la data esatta di oggi
                     var pastiDelGiorno = viewModel.pasti
-                        .where((p) => p.giorno == giornoCorrente)
+                        .where((p) => p.id.startsWith(stringaData))
                         .toList();
 
                     return Container(
@@ -157,7 +161,7 @@ class _PianoPastiViewState extends State<PianoPastiView> {
                                             builder: (context) =>
                                                 SchermataModificaPianoPasti(
                                               pasto: PianoPasti(
-                                                id: '',
+                                                id: stringaData, // Passiamo la data come ID di base
                                                 giorno: giornoCorrente,
                                                 tipologia: '',
                                                 nomeRicetta: '-',
@@ -200,10 +204,12 @@ class _PianoPastiViewState extends State<PianoPastiView> {
                                                       ),
                                                     ),
                                                     ...PianoPasti.tipologie.map((tipologia) {
+                                                      // Usiamo l'ID esatto (Data + Tipologia)
+                                                      String idCasella = "${stringaData}_$tipologia";
                                                       var pastoDaModificare = pastiDelGiorno.firstWhere(
-                                                        (p) => p.tipologia == tipologia,
+                                                        (p) => p.id == idCasella,
                                                         orElse: () => PianoPasti(
-                                                          id: '',
+                                                          id: idCasella,
                                                           giorno: giornoCorrente,
                                                           tipologia: tipologia,
                                                           nomeRicetta: '-',
@@ -249,10 +255,11 @@ class _PianoPastiViewState extends State<PianoPastiView> {
                             ),
                             const SizedBox(height: 16),
                             ...PianoPasti.tipologie.map((tipologia) {
+                              String idCasella = "${stringaData}_$tipologia";
                               var pasto = pastiDelGiorno.firstWhere(
-                                (p) => p.tipologia == tipologia,
+                                (p) => p.id == idCasella,
                                 orElse: () => PianoPasti(
-                                  id: '',
+                                  id: idCasella,
                                   giorno: giornoCorrente,
                                   tipologia: tipologia,
                                   nomeRicetta: '-',

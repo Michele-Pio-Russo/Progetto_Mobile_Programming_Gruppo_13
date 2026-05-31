@@ -27,8 +27,8 @@ class AppStyle {
       scaffoldBackgroundColor: coloreSfondo,
       primaryColor: colorePrimario,
       colorScheme: const ColorScheme.light(
-        primary: colorePrimario,
-        onPrimary: coloreBianco,
+        primary: Color(0xFF7CA982),
+        onPrimary: Color(0xFFFFFFFF),
         surface: coloreSfondo,
         onSurface: coloreTestoPrincipale,
         error: coloreErrore,

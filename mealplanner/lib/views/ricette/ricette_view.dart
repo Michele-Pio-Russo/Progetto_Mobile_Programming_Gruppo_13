@@ -6,7 +6,6 @@ import 'ricette_modifica_view.dart';
 import 'ricette_dettaglio_view.dart';
 import '../../theme/style.dart';
 
-
 // Schermata principale che elenca tutte le ricette nel ricettacolo
 class RicetteView extends StatefulWidget {
   // Costruttore della schermata delle ricette
@@ -18,8 +17,10 @@ class RicetteView extends StatefulWidget {
 
 // Classe per la gestione dello stato della schermata delle ricette
 class _RicetteViewState extends State<RicetteView> {
-  String _categoriaSelezionata = 'Tutte'; // Salva la categoria corrente selezionata per filtrare
-  String _queryRicerca = ''; // Salva il testo cercato dall'utente nella barra in alto
+  String _categoriaSelezionata =
+      'Tutte'; // Salva la categoria corrente selezionata per filtrare
+  String _queryRicerca =
+      ''; // Salva il testo cercato dall'utente nella barra in alto
   int? _difficoltaSelezionata; // null significa che vogliamo vedere "Tutte"
   String _tempoSelezionato = 'Tutti'; // Per filtrare il tempo (es. "< 15 min")
 
@@ -27,33 +28,37 @@ class _RicetteViewState extends State<RicetteView> {
   @override
   Widget build(BuildContext context) {
     final viewModel = Provider.of<RicetteViewModel>(context);
-    
+
     // Applichiamo i filtri in sequenza: prima testo, poi categoria, difficoltà e infine il tempo
-    
+
     // 1. Filtraggio tramite barra di ricerca testuale
     List<Ricette> ricetteFiltrate = viewModel.cercaRicette(_queryRicerca);
-    
+
     // 2. Filtraggio tramite categoria
     if (_categoriaSelezionata != 'Tutte') {
-      ricetteFiltrate = ricetteFiltrate.where((r) => r.categoria == _categoriaSelezionata).toList();
+      ricetteFiltrate = ricetteFiltrate
+          .where((r) => r.categoria == _categoriaSelezionata)
+          .toList();
     }
-    
+
     // 3. Filtraggio tramite livello di difficoltà (fiammelle)
     if (_difficoltaSelezionata != null) {
-      ricetteFiltrate = ricetteFiltrate.where((r) => r.difficolta == _difficoltaSelezionata).toList();
+      ricetteFiltrate = ricetteFiltrate
+          .where((r) => r.difficolta == _difficoltaSelezionata)
+          .toList();
     }
-    
+
     // 4. Filtraggio tramite tempo stimato
     if (_tempoSelezionato != 'Tutti') {
       ricetteFiltrate = ricetteFiltrate.where((r) {
         // Il tempo è salvato come testo (es. "20"), proviamo a convertirlo in numero per fare i confronti matematici
         int tempo = int.tryParse(r.tempoPreparazione) ?? 0;
-        
+
         // Applichiamo i raggruppamenti del filtro
         if (_tempoSelezionato == '< 15 min') return tempo > 0 && tempo < 15;
         if (_tempoSelezionato == '15-30 min') return tempo >= 15 && tempo <= 30;
         if (_tempoSelezionato == '> 30 min') return tempo > 30;
-        
+
         return true; // Per fallback mostriamo la ricetta
       }).toList();
     }
@@ -67,7 +72,9 @@ class _RicetteViewState extends State<RicetteView> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const RicetteModificaView()),
+                MaterialPageRoute(
+                  builder: (context) => const RicetteModificaView(),
+                ),
               );
             },
           ),
@@ -77,7 +84,10 @@ class _RicetteViewState extends State<RicetteView> {
         children: [
           // Barra di Ricerca e Filtro Categoria
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16.0,
+              vertical: 8.0,
+            ),
             child: Row(
               children: [
                 Expanded(
@@ -90,14 +100,29 @@ class _RicetteViewState extends State<RicetteView> {
                     },
                     decoration: InputDecoration(
                       hintText: 'Cerca...',
-                      prefixIcon: const Icon(Icons.search_outlined, color: AppStyle.coloreTestoSecondario),
+                      prefixIcon: const Icon(
+                        Icons.search_outlined,
+                        color: AppStyle.coloreTestoSecondario,
+                      ),
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(AppStyle.raggioBottoni),
-                        borderSide: BorderSide(color: AppStyle.coloreTestoSecondario.withOpacity(0.2)),
+                        borderRadius: BorderRadius.circular(
+                          AppStyle.raggioBottoni,
+                        ),
+                        borderSide: BorderSide(
+                          color: AppStyle.coloreTestoSecondario.withOpacity(
+                            0.2,
+                          ),
+                        ),
                       ),
                       enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(AppStyle.raggioBottoni),
-                        borderSide: BorderSide(color: AppStyle.coloreTestoSecondario.withOpacity(0.2)),
+                        borderRadius: BorderRadius.circular(
+                          AppStyle.raggioBottoni,
+                        ),
+                        borderSide: BorderSide(
+                          color: AppStyle.coloreTestoSecondario.withOpacity(
+                            0.2,
+                          ),
+                        ),
                       ),
                       contentPadding: const EdgeInsets.symmetric(vertical: 0),
                     ),
@@ -107,17 +132,33 @@ class _RicetteViewState extends State<RicetteView> {
                 Expanded(
                   flex: 1,
                   child: DropdownButtonFormField<String>(
+                    isExpanded:
+                        true, // <-- AGGIUNTO: Risolve l'overflow tagliando il testo troppo lungo!
                     initialValue: _categoriaSelezionata,
                     decoration: InputDecoration(
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(AppStyle.raggioBottoni),
-                        borderSide: BorderSide(color: AppStyle.coloreTestoSecondario.withOpacity(0.2)),
+                        borderRadius: BorderRadius.circular(
+                          AppStyle.raggioBottoni,
+                        ),
+                        borderSide: BorderSide(
+                          color: AppStyle.coloreTestoSecondario.withOpacity(
+                            0.2,
+                          ),
+                        ),
                       ),
                       enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(AppStyle.raggioBottoni),
-                        borderSide: BorderSide(color: AppStyle.coloreTestoSecondario.withOpacity(0.2)),
+                        borderRadius: BorderRadius.circular(
+                          AppStyle.raggioBottoni,
+                        ),
+                        borderSide: BorderSide(
+                          color: AppStyle.coloreTestoSecondario.withOpacity(
+                            0.2,
+                          ),
+                        ),
                       ),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 10),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                      ),
                     ),
                     items: ['Tutte', ...Ricette.categorie].map((String cat) {
                       return DropdownMenuItem<String>(
@@ -135,7 +176,7 @@ class _RicetteViewState extends State<RicetteView> {
               ],
             ),
           ),
-          
+
           // Filtri avanzati
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
@@ -147,23 +188,40 @@ class _RicetteViewState extends State<RicetteView> {
                   value: _difficoltaSelezionata,
                   hint: const Text('Difficoltà'),
                   items: [
-                    const DropdownMenuItem(value: null, child: Text('Tutte le difficoltà')),
-                    ...List.generate(5, (index) => DropdownMenuItem(
-                      value: index + 1, 
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center, // Centra le fiammelle all'interno della riga
-                        children: List.generate(index + 1, (_) => const Icon(Icons.local_fire_department_outlined, color: Colors.orange, size: 16))
-                      )
-                    )),
+                    const DropdownMenuItem(
+                      value: null,
+                      child: Text('Tutte le difficoltà'),
+                    ),
+                    ...List.generate(
+                      5,
+                      (index) => DropdownMenuItem(
+                        value: index + 1,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment
+                              .center, // Centra le fiammelle all'interno della riga
+                          children: List.generate(
+                            index + 1,
+                            (_) => const Icon(
+                              Icons.local_fire_department_outlined,
+                              color: Colors.orange,
+                              size: 16,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
                   ],
-                  onChanged: (val) => setState(() => _difficoltaSelezionata = val),
+                  onChanged: (val) =>
+                      setState(() => _difficoltaSelezionata = val),
                 ),
                 const SizedBox(width: 16),
                 // Filtro Tempo
                 DropdownButton<String>(
                   value: _tempoSelezionato,
                   hint: const Text('Tempo'),
-                  items: ['Tutti', '< 15 min', '15-30 min', '> 30 min'].map((t) => DropdownMenuItem(value: t, child: Text(t))).toList(),
+                  items: ['Tutti', '< 15 min', '15-30 min', '> 30 min']
+                      .map((t) => DropdownMenuItem(value: t, child: Text(t)))
+                      .toList(),
                   onChanged: (val) {
                     if (val != null) setState(() => _tempoSelezionato = val);
                   },
@@ -173,30 +231,47 @@ class _RicetteViewState extends State<RicetteView> {
           ),
 
           const SizedBox(height: 10),
-          
+
           // Lista delle Ricette
           Expanded(
             child: ricetteFiltrate.isEmpty
-                ? const Center(child: Text('Nessuna ricetta trovata.')) // Messaggio mostrato se i filtri escludono tutto
+                ? const Center(
+                    child: Text('Nessuna ricetta trovata.'),
+                  ) // Messaggio mostrato se i filtri escludono tutto
                 : ListView.builder(
-                    itemCount: ricetteFiltrate.length, // Definisce quante righe generare dinamicamente
+                    itemCount: ricetteFiltrate
+                        .length, // Definisce quante righe generare dinamicamente
                     itemBuilder: (context, index) {
-                      final ricetta = ricetteFiltrate[index]; // Estraggo la ricetta specifica per questa riga
+                      final ricetta =
+                          ricetteFiltrate[index]; // Estraggo la ricetta specifica per questa riga
                       return Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                        margin: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 6,
+                        ),
                         decoration: BoxDecoration(
                           color: AppStyle.coloreBianco,
-                          borderRadius: BorderRadius.circular(AppStyle.raggioCard),
+                          borderRadius: BorderRadius.circular(
+                            AppStyle.raggioCard,
+                          ),
                           boxShadow: AppStyle.ombraNuvola,
                         ),
                         child: ListTile(
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppStyle.raggioCard)),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(
+                              AppStyle.raggioCard,
+                            ),
+                          ),
                           onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => RicetteDettaglioView(ricetta: ricetta),
+                                builder: (context) =>
+                                    RicetteDettaglioView(ricetta: ricetta),
                               ),
                             );
                           },
@@ -204,24 +279,46 @@ class _RicetteViewState extends State<RicetteView> {
                             width: 50,
                             height: 50,
                             decoration: BoxDecoration(
-                              color: AppStyle.coloreTestoSecondario.withOpacity(0.1),
+                              color: AppStyle.coloreTestoSecondario.withOpacity(
+                                0.1,
+                              ),
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            child: const Icon(Icons.restaurant_outlined, color: AppStyle.coloreTestoSecondario),
+                            child: const Icon(
+                              Icons.restaurant_outlined,
+                              color: AppStyle.coloreTestoSecondario,
+                            ),
                           ),
                           title: Row(
                             children: [
-                              Expanded(child: Text(ricetta.titolo, style: const TextStyle(fontWeight: FontWeight.bold))),
+                              Expanded(
+                                child: Text(
+                                  ricetta.titolo,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
                               // Se è una ricetta di sistema, mostriamo un piccolo badge "Predefinita"
                               if (ricetta.isPredefinita)
                                 Container(
                                   margin: const EdgeInsets.only(left: 8),
-                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 6,
+                                    vertical: 2,
+                                  ),
                                   decoration: BoxDecoration(
-                                    color: Colors.amber.withOpacity(0.1), 
+                                    color: Colors.amber.withOpacity(0.1),
                                     borderRadius: BorderRadius.circular(8),
                                   ),
-                                  child: const Text('⭐ Predefinita', style: TextStyle(fontSize: 10, color: Colors.orange, fontWeight: FontWeight.bold)),
+                                  child: const Text(
+                                    '⭐ Predefinita',
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      color: Colors.orange,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                                 ),
                             ],
                           ),
@@ -229,15 +326,23 @@ class _RicetteViewState extends State<RicetteView> {
                             ricetta.preparazione,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(fontSize: 12, color: AppStyle.coloreTestoSecondario),
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: AppStyle.coloreTestoSecondario,
+                            ),
                           ),
                           trailing: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 4,
+                                ),
                                 decoration: BoxDecoration(
-                                  color: AppStyle.colorePrimario.withOpacity(0.1),
+                                  color: AppStyle.colorePrimario.withOpacity(
+                                    0.1,
+                                  ),
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 child: Text(
@@ -250,13 +355,17 @@ class _RicetteViewState extends State<RicetteView> {
                                 ),
                               ),
                               IconButton(
-                                icon: const Icon(Icons.edit_outlined, color: AppStyle.coloreTestoSecondario),
+                                icon: const Icon(
+                                  Icons.edit_outlined,
+                                  color: AppStyle.coloreTestoSecondario,
+                                ),
                                 onPressed: () {
                                   // Cliccando la matita navighiamo direttamente alla schermata di modifica
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => RicetteModificaView(ricetta: ricetta),
+                                      builder: (context) =>
+                                          RicetteModificaView(ricetta: ricetta),
                                     ),
                                   );
                                 },
