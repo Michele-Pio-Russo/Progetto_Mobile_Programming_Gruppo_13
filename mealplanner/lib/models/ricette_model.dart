@@ -119,12 +119,18 @@ class Ricette {
       }
     }
 
+    String cat = json['categoria'] ?? 'Altro';
+    if (cat == 'Primi Piatti') cat = 'Primo Piatto';
+    else if (cat == 'Secondi Piatti') cat = 'Secondo Piatto';
+    else if (cat == 'Dolci') cat = 'Dolce';
+    else if (!categorie.contains(cat)) cat = 'Altro';
+
     return Ricette(
       id: json['id'],
       titolo: json['titolo'],
       preparazione: json['preparazione'] ?? json['descrizione'] ?? '',
       ingredienti: ingredientiParsati,
-      categoria: json['categoria'] ?? 'Altro',
+      categoria: cat,
       tempoPreparazione: json['tempoPreparazione'] ?? 'N/D',
       difficolta: diffParsed,
       quantita: json['quantita'] ?? 'N/D',

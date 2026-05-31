@@ -208,6 +208,15 @@ class StatisticheView extends StatelessWidget {
                                 ),
                               ),
                             ),
+                            const SizedBox(width: 8),
+                            Text(
+                              '${entry.value}',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: AppStyle.coloreTestoPrincipale,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ],
                         ),
                       );

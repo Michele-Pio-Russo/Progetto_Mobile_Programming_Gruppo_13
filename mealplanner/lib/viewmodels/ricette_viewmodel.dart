@@ -32,7 +32,7 @@ class RicetteViewModel extends ChangeNotifier {
         Ingrediente(nome: 'Uova', quantita: '4', unitaMisura: 'pz'),
         Ingrediente(nome: 'Pepe nero', quantita: 'q.b.', unitaMisura: 'q.b.')
       ],
-      categoria: 'Primi Piatti', // Corretto per combaciare esattamente con la lista fissa
+      categoria: 'Primo Piatto', // Corretto per combaciare esattamente con la lista fissa
       tempoPreparazione: '20', // Inserito numerico per agevolare i calcoli
       difficolta: 2,
       quantita: '4 persone',
@@ -86,7 +86,7 @@ class RicetteViewModel extends ChangeNotifier {
         Ingrediente(nome: 'Ketchup', quantita: 'q.b.', unitaMisura: ''),
         Ingrediente(nome: 'Maionese', quantita: 'q.b.', unitaMisura: ''),
       ],
-      categoria: 'Secondi Piatti', // Corretto per combaciare con la lista
+      categoria: 'Secondo Piatto', // Corretto per combaciare con la lista
       tempoPreparazione: '20',
       difficolta: 3,
       quantita: '2 porzioni',
@@ -155,7 +155,7 @@ class RicetteViewModel extends ChangeNotifier {
         Ingrediente(nome: 'Uova', quantita: '3', unitaMisura: 'pz'),
         Ingrediente(nome: 'Lievito per dolci', quantita: '1', unitaMisura: 'bustina'),
       ],
-      categoria: 'Dolci', // Corretto per combaciare con la lista
+      categoria: 'Dolce', // Corretto per combaciare con la lista
       tempoPreparazione: '60',
       difficolta: 3,
       quantita: '8 porzioni',
@@ -171,7 +171,7 @@ class RicetteViewModel extends ChangeNotifier {
         Ingrediente(nome: 'Topping al cioccolato', quantita: 'q.b.', unitaMisura: ''),
         Ingrediente(nome: 'Granella di nocciole', quantita: 'q.b.', unitaMisura: ''),
       ],
-      categoria: 'Dolci', // Corretto per combaciare con la lista
+      categoria: 'Dolce', // Corretto per combaciare con la lista
       tempoPreparazione: '5',
       difficolta: 1,
       quantita: '2 porzioni',

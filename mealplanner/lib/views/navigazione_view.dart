@@ -19,10 +19,10 @@ class _SchermataPrincipaleState extends State<SchermataPrincipale> {
   int _indiceSelezionato = 1;
 
   final List<Widget> _pagine = [
+    const SchermataDispensa(),
     const RicetteView(),
     const PianoPastiView(),
     const ListaSpesaView(),
-    const SchermataDispensa(),
     const StatisticheView(),
   ];
 
@@ -34,8 +34,8 @@ class _SchermataPrincipaleState extends State<SchermataPrincipale> {
         type: BottomNavigationBarType.fixed,
         backgroundColor: AppStyle.coloreSfondo,
         currentIndex: _indiceSelezionato,
-        selectedItemColor: AppStyle.colorePrimario, 
-        unselectedItemColor: AppStyle.coloreTestoSecondario, 
+        selectedItemColor: AppStyle.colorePrimario,
+        unselectedItemColor: AppStyle.coloreTestoSecondario,
         onTap: (int nuovoIndice) {
           setState(() {
             _indiceSelezionato = nuovoIndice;
@@ -43,23 +43,41 @@ class _SchermataPrincipaleState extends State<SchermataPrincipale> {
         },
         items: [
           BottomNavigationBarItem(
-            icon: Icon(_indiceSelezionato == 0 ? Icons.restaurant_menu : Icons.restaurant_menu_outlined),
-            label: 'Ricette',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(_indiceSelezionato == 1 ? Icons.calendar_month : Icons.calendar_month_outlined),
-            label: 'Piano',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(_indiceSelezionato == 2 ? Icons.shopping_cart : Icons.shopping_cart_outlined),
-            label: 'Spesa',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(_indiceSelezionato == 3 ? Icons.kitchen : Icons.kitchen_outlined),
+            icon: Icon(
+              _indiceSelezionato == 0 ? Icons.kitchen : Icons.kitchen_outlined,
+            ),
             label: 'Dispensa',
           ),
           BottomNavigationBarItem(
-            icon: Icon(_indiceSelezionato == 4 ? Icons.bar_chart : Icons.bar_chart_outlined),
+            icon: Icon(
+              _indiceSelezionato == 1
+                  ? Icons.restaurant_menu
+                  : Icons.restaurant_menu_outlined,
+            ),
+            label: 'Ricette',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(
+              _indiceSelezionato == 2
+                  ? Icons.calendar_month
+                  : Icons.calendar_month_outlined,
+            ),
+            label: 'Piano',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(
+              _indiceSelezionato == 3
+                  ? Icons.shopping_cart
+                  : Icons.shopping_cart_outlined,
+            ),
+            label: 'Spesa',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(
+              _indiceSelezionato == 4
+                  ? Icons.bar_chart
+                  : Icons.bar_chart_outlined,
+            ),
             label: 'Statistiche',
           ),
         ],
