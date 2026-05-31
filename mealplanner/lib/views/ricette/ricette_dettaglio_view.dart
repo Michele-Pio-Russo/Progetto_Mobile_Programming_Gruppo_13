@@ -3,14 +3,14 @@ import '../../models/ricette_model.dart';
 import '../../theme/style.dart';
 
 
-/// Schermata di visualizzazione in sola lettura.
-/// Mostra tutti i dettagli di una singola [Ricette] passata al costruttore,
-/// includendo categoria, tempo, difficoltà, lista degli ingredienti formattata e procedimento.
+// Schermata di visualizzazione in sola lettura.
+// Mostra tutti i dettagli di una singola [Ricette] passata al costruttore,
+// includendo categoria, tempo, difficoltà, lista degli ingredienti formattata e procedimento.
 class RicetteDettaglioView extends StatelessWidget {
-  /// L'oggetto ricetta di cui mostrare i dettagli.
+  // L'oggetto ricetta di cui mostrare i dettagli.
   final Ricette ricetta;
 
-  /// Costruttore che richiede obbligatoriamente l'oggetto [ricetta]
+  // Costruttore che richiede obbligatoriamente l'oggetto [ricetta]
   const RicetteDettaglioView({super.key, required this.ricetta});
 
   @override
@@ -102,8 +102,8 @@ class RicetteDettaglioView extends StatelessWidget {
     );
   }
 
-  /// Costruisce una piccola colonna contenente un'icona e una label di testo.
-  /// È utilizzata per la sezione di informazioni rapide (es. tempo di preparazione e porzioni).
+  // Costruisce una piccola colonna contenente un'icona e una label di testo.
+  // È utilizzata per la sezione di informazioni rapide (es. tempo di preparazione e porzioni).
   Widget _buildInfoBadge(IconData icon, String label) {
     return Expanded(
       child: Column(
@@ -116,9 +116,9 @@ class RicetteDettaglioView extends StatelessWidget {
     );
   }
 
-  /// Costruisce il badge per la difficoltà della ricetta.
-  /// Disegna fino a 5 fiammelle e colora di arancione un numero di fiammelle pari a [difficolta],
-  /// lasciando le restanti grigie e traslucide.
+  // Costruisce il badge per la difficoltà della ricetta.
+  // Disegna fino a 5 fiammelle e colora di arancione un numero di fiammelle pari a [difficolta],
+  // lasciando le restanti grigie e traslucide.
   Widget _buildDifficoltaBadge(int difficolta) {
     return Expanded(
       child: Column(

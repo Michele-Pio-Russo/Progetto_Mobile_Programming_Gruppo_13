@@ -6,10 +6,10 @@ import 'ricette_modifica_view.dart';
 import 'ricette_dettaglio_view.dart';
 import '../../theme/style.dart';
 
-/// Schermata principale del Ricettario.
-/// Permette all'utente di visualizzare l'elenco di tutte le ricette,
-/// filtrarle per testo, categoria, difficoltà e tempo di preparazione,
-/// e navigare verso la schermata di dettaglio o di aggiunta/modifica.
+// Schermata principale del Ricettario.
+// Permette all'utente di visualizzare l'elenco di tutte le ricette,
+// filtrarle per testo, categoria, difficoltà e tempo di preparazione,
+// e navigare verso la schermata di dettaglio o di aggiunta/modifica.
 class RicetteView extends StatefulWidget {
   // Costruttore della schermata delle ricette
   const RicetteView({super.key});
@@ -20,18 +20,18 @@ class RicetteView extends StatefulWidget {
 
 // Classe per la gestione dello stato della schermata delle ricette
 class _RicetteViewState extends State<RicetteView> {
-  /// Categoria correntemente selezionata per il filtraggio (es. 'Primi Piatti'). 
-  /// 'Tutte' disabilita il filtro.
+  // Categoria correntemente selezionata per il filtraggio (es. 'Primi Piatti'). 
+  // 'Tutte' disabilita il filtro.
   String _categoriaSelezionata = 'Tutte'; 
   
-  /// Testo digitato dall'utente nella barra di ricerca per trovare ricette per titolo.
+  // Testo digitato dall'utente nella barra di ricerca per trovare ricette per titolo.
   String _queryRicerca = ''; 
   
-  /// Livello di difficoltà selezionato (da 1 a 5 fiammelle).
-  /// Se null, il filtro è disabilitato e mostra tutte le difficoltà.
+  // Livello di difficoltà selezionato (da 1 a 5 fiammelle).
+  // Se null, il filtro è disabilitato e mostra tutte le difficoltà.
   int? _difficoltaSelezionata; 
   
-  /// Filtro sul tempo stimato di preparazione ('Tutti', '< 15 min', '15-30 min', '> 30 min').
+  // Filtro sul tempo stimato di preparazione ('Tutti', '< 15 min', '15-30 min', '> 30 min').
   String _tempoSelezionato = 'Tutti';
 
   // Disegna l'interfaccia con la barra di ricerca, i filtri e la lista delle ricette

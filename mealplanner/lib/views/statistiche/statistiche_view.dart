@@ -7,9 +7,9 @@ import '../../viewmodels/ricette_viewmodel.dart';
 import '../../viewmodels/dispensa_viewmodel.dart';
 import '../../viewmodels/piano_pasti_viewmodel.dart';
 
-/// Schermata che visualizza le statistiche generali dell'app.
-/// Aggrega e mostra metriche importanti basate sui dati dei ViewModel:
-/// ricette salvate, prodotti in scadenza, pasti pianificati, e ingredienti mancanti.
+// Schermata che visualizza le statistiche generali dell'app.
+// Aggrega e mostra metriche importanti basate sui dati dei ViewModel:
+// ricette salvate, prodotti in scadenza, pasti pianificati, e ingredienti mancanti.
 class StatisticheView extends StatelessWidget {
   const StatisticheView({super.key});
 
@@ -333,8 +333,8 @@ class StatisticheView extends StatelessWidget {
     );
   }
 
-  /// Metodo di utilità per ricavare il nome del giorno della settimana attuale.
-  /// Ritorna una stringa formattata compatibile con quelle salvate nel piano pasti.
+  // Metodo di utilità per ricavare il nome del giorno della settimana attuale.
+  // Ritorna una stringa formattata compatibile con quelle salvate nel piano pasti.
   String _getGiornoOdierno() {
     switch (DateTime.now().weekday) {
       case 1: return 'Lunedì';
@@ -358,8 +358,8 @@ class StatisticheView extends StatelessWidget {
     Colors.teal,
   ];
 
-  /// Costruisce i dati per ogni sezione del grafico a torta.
-  /// Associa un colore ciclico dalla lista `_chartColors` in base al valore.
+  // Costruisce i dati per ogni sezione del grafico a torta.
+  // Associa un colore ciclico dalla lista `_chartColors` in base al valore.
   List<PieChartSectionData> _buildPieSections(Map<String, int> catMap) {
     int i = 0;
     final entries = catMap.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
@@ -375,8 +375,8 @@ class StatisticheView extends StatelessWidget {
     }).toList();
   }
 
-  /// Costruisce la legenda posta accanto al grafico a torta.
-  /// Calcola anche la percentuale di ogni singola voce rispetto al totale.
+  // Costruisce la legenda posta accanto al grafico a torta.
+  // Calcola anche la percentuale di ogni singola voce rispetto al totale.
   List<Widget> _buildLegend(Map<String, int> catMap) {
     int total = catMap.values.fold(0, (sum, val) => sum + val);
     int i = 0;

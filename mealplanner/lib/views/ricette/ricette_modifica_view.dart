@@ -7,28 +7,28 @@ import '../../models/ricette_model.dart';
 import '../../theme/style.dart';
 
 
-/// Classe di supporto interna per gestire in modo indipendente i controller di ogni singola riga di ingrediente.
-/// Permette di aggiungere e rimuovere dinamicamente gli ingredienti nella maschera di modifica.
+// Classe di supporto interna per gestire in modo indipendente i controller di ogni singola riga di ingrediente.
+// Permette di aggiungere e rimuovere dinamicamente gli ingredienti nella maschera di modifica.
 class _IngredienteRiga {
-  /// Controller per catturare il nome del singolo ingrediente digitato dall'utente
+  // Controller per catturare il nome del singolo ingrediente digitato dall'utente
   final TextEditingController nomeCtrl = TextEditingController(); 
   
-  /// Controller per catturare la quantità numerica (o testuale se 'q.b.')
+  // Controller per catturare la quantità numerica (o testuale se 'q.b.')
   final TextEditingController quantitaCtrl = TextEditingController(); 
   
-  /// Valore di default dell'unità di misura selezionata per questa riga
+  // Valore di default dell'unità di misura selezionata per questa riga
   String unitaMisura = 'g'; 
 
-  /// Metodo per liberare la memoria dei controller testuali quando la riga viene cancellata.
-  /// Fondamentale per evitare memory leaks in Flutter.
+  // Metodo per liberare la memoria dei controller testuali quando la riga viene cancellata.
+  // Fondamentale per evitare memory leaks in Flutter.
   void dispose() {
     nomeCtrl.dispose();
     quantitaCtrl.dispose();
   }
 }
 
-/// Schermata responsabile dell'inserimento di una nuova ricetta o della modifica di una esistente.
-/// Il comportamento (Salva vs Modifica) varia dinamicamente se viene passata una [Ricette] al costruttore.
+// Schermata responsabile dell'inserimento di una nuova ricetta o della modifica di una esistente.
+// Il comportamento (Salva vs Modifica) varia dinamicamente se viene passata una [Ricette] al costruttore.
 class RicetteModificaView extends StatefulWidget {
   final Ricette?
   ricetta; // Se è null siamo in modalità "Aggiungi", altrimenti "Modifica"
@@ -42,41 +42,41 @@ class RicetteModificaView extends StatefulWidget {
 
 // Stato per la gestione della schermata di aggiunta/modifica ricetta
 class _RicetteModificaViewState extends State<RicetteModificaView> {
-  /// Chiave globale per identificare univocamente il Form e permetterne la validazione.
+  // Chiave globale per identificare univocamente il Form e permetterne la validazione.
   final _formKey = GlobalKey<FormState>(); 
 
   // --- Controller Testuali ---
-  /// Controller per il nome principale della ricetta
+  // Controller per il nome principale della ricetta
   late TextEditingController _titoloController; 
   
-  /// Controller per le istruzioni dettagliate (il procedimento)
+  // Controller per le istruzioni dettagliate (il procedimento)
   late TextEditingController _preparazioneController; 
   
-  /// Controller per i minuti stimati di preparazione
+  // Controller per i minuti stimati di preparazione
   late TextEditingController _tempoPreparazioneController; 
   
-  /// Controller per il numero di porzioni (es. "2 persone")
+  // Controller per il numero di porzioni (es. "2 persone")
   late TextEditingController _quantitaController; 
   
-  /// Controller per eventuali suggerimenti e annotazioni opzionali
+  // Controller per eventuali suggerimenti e annotazioni opzionali
   late TextEditingController _noteController; 
   
-  /// Lista dinamica che mantiene lo stato di tutte le righe di ingredienti visibili
+  // Lista dinamica che mantiene lo stato di tutte le righe di ingredienti visibili
   final List<_IngredienteRiga> _ingredientiRighe = []; 
 
-  /// Memorizza temporaneamente la categoria selezionata dal DropdownButton
+  // Memorizza temporaneamente la categoria selezionata dal DropdownButton
   String? _categoriaSelezionata; 
   
-  /// Valore della difficoltà espresso da 1 a 5. Di default è 1.
+  // Valore della difficoltà espresso da 1 a 5. Di default è 1.
   int _difficoltaSelezionata = 1; 
 
-  /// Getter di comodità per stabilire in modo leggibile se siamo in modalità Modifica.
-  /// Ritorna `true` se al costruttore del widget padre è stata passata una ricetta esistente.
+  // Getter di comodità per stabilire in modo leggibile se siamo in modalità Modifica.
+  // Ritorna `true` se al costruttore del widget padre è stata passata una ricetta esistente.
   bool get eModalitaModifica => widget.ricetta != null;
 
-  /// Inizializza lo stato del componente.
-  /// Se stiamo modificando, pre-popola tutti i [TextEditingController] con i dati preesistenti.
-  /// Altrimenti li inizializza vuoti.
+  // Inizializza lo stato del componente.
+  // Se stiamo modificando, pre-popola tutti i [TextEditingController] con i dati preesistenti.
+  // Altrimenti li inizializza vuoti.
   @override
   void initState() {
     super.initState();
@@ -112,8 +112,8 @@ class _RicetteModificaViewState extends State<RicetteModificaView> {
     _categoriaSelezionata = widget.ricetta?.categoria;
   }
 
-  /// Override del metodo dispose: chiamato prima che il widget venga distrutto in modo permanente.
-  /// Scopo critico: pulire la RAM deallocando tutti i controller di testo e le relative righe figlie.
+  // Override del metodo dispose: chiamato prima che il widget venga distrutto in modo permanente.
+  // Scopo critico: pulire la RAM deallocando tutti i controller di testo e le relative righe figlie.
   @override
   void dispose() {
     _titoloController.dispose();
@@ -127,17 +127,17 @@ class _RicetteModificaViewState extends State<RicetteModificaView> {
     super.dispose();
   }
 
-  /// Metodo invocato quando l'utente clicca sul pulsante "+" per aggiungere ingredienti extra.
-  /// Triggera un [setState] che spinge Flutter a ridisegnare la lista `_ingredientiRighe`.
+  // Metodo invocato quando l'utente clicca sul pulsante "+" per aggiungere ingredienti extra.
+  // Triggera un [setState] che spinge Flutter a ridisegnare la lista `_ingredientiRighe`.
   void _aggiungiIngrediente() {
     setState(() {
       _ingredientiRighe.add(_IngredienteRiga());
     });
   }
 
-  /// Cancella uno specifico ingrediente dall'elenco basandosi sul suo `index`.
-  /// Se l'utente rimuove l'ultimo ingrediente disponibile, rimpiazziamo immediatamente
-  /// con uno nuovo vuoto, per evitare bug di interfaccia (nessun form visibile).
+  // Cancella uno specifico ingrediente dall'elenco basandosi sul suo `index`.
+  // Se l'utente rimuove l'ultimo ingrediente disponibile, rimpiazziamo immediatamente
+  // con uno nuovo vuoto, per evitare bug di interfaccia (nessun form visibile).
   void _rimuoviIngrediente(int index) {
     setState(() {
       _ingredientiRighe[index].dispose(); // Pulizia risorsa singola
@@ -150,8 +150,8 @@ class _RicetteModificaViewState extends State<RicetteModificaView> {
     });
   }
 
-  /// Helper Dialog: Mostra un pop-up di avviso prima di eliminare definitivamente una ricetta.
-  /// Contiene logica di pulizia aggiuntiva collegata ai pasti pianificati.
+  // Helper Dialog: Mostra un pop-up di avviso prima di eliminare definitivamente una ricetta.
+  // Contiene logica di pulizia aggiuntiva collegata ai pasti pianificati.
   void _mostraConfermaEliminazione(BuildContext context, RicetteViewModel viewModel) {
     showDialog(
       context: context,
