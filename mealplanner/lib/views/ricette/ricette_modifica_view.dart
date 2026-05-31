@@ -7,23 +7,28 @@ import '../../models/ricette_model.dart';
 import '../../theme/style.dart';
 
 
-// Classe di supporto interna per mantenere i controller di ogni singola riga di ingrediente
+/// Classe di supporto interna per gestire in modo indipendente i controller di ogni singola riga di ingrediente.
+/// Permette di aggiungere e rimuovere dinamicamente gli ingredienti nella maschera di modifica.
 class _IngredienteRiga {
-  final TextEditingController nomeCtrl =
-      TextEditingController(); // Controller per catturare il nome del singolo ingrediente
-  final TextEditingController quantitaCtrl =
-      TextEditingController(); // Controller per catturare la quantità numerica del singolo ingrediente
-  String unitaMisura =
-      'g'; // Valore di default dell'unità di misura per questa riga
+  /// Controller per catturare il nome del singolo ingrediente digitato dall'utente
+  final TextEditingController nomeCtrl = TextEditingController(); 
+  
+  /// Controller per catturare la quantità numerica (o testuale se 'q.b.')
+  final TextEditingController quantitaCtrl = TextEditingController(); 
+  
+  /// Valore di default dell'unità di misura selezionata per questa riga
+  String unitaMisura = 'g'; 
 
-  // Metodo per liberare la memoria quando la riga non serve più
+  /// Metodo per liberare la memoria dei controller testuali quando la riga viene cancellata.
+  /// Fondamentale per evitare memory leaks in Flutter.
   void dispose() {
     nomeCtrl.dispose();
     quantitaCtrl.dispose();
   }
 }
 
-// Classe che gestisce la schermata per aggiungere o modificare una ricetta
+/// Schermata responsabile dell'inserimento di una nuova ricetta o della modifica di una esistente.
+/// Il comportamento (Salva vs Modifica) varia dinamicamente se viene passata una [Ricette] al costruttore.
 class RicetteModificaView extends StatefulWidget {
   final Ricette?
   ricetta; // Se è null siamo in modalità "Aggiungi", altrimenti "Modifica"
@@ -37,90 +42,78 @@ class RicetteModificaView extends StatefulWidget {
 
 // Stato per la gestione della schermata di aggiunta/modifica ricetta
 class _RicetteModificaViewState extends State<RicetteModificaView> {
-  final _formKey =
-      GlobalKey<
-        FormState
-      >(); // Chiave per validare i campi obbligatori del form
+  /// Chiave globale per identificare univocamente il Form e permetterne la validazione.
+  final _formKey = GlobalKey<FormState>(); 
 
-  // Controller usati per catturare e leggere i testi digitati dall'utente
-  late TextEditingController
-  _titoloController; // Controller per il nome della ricetta
-  late TextEditingController
-  _preparazioneController; // Controller per le istruzioni
-  late TextEditingController
-  _tempoPreparazioneController; // Controller per i minuti richiesti
-  late TextEditingController
-  _quantitaController; // Controller per il numero di porzioni
-  late TextEditingController _noteController; // Controller per consigli extra
-  final List<_IngredienteRiga> _ingredientiRighe =
-      []; // Lista per gestire dinamicamente più righe di ingredienti
+  // --- Controller Testuali ---
+  /// Controller per il nome principale della ricetta
+  late TextEditingController _titoloController; 
+  
+  /// Controller per le istruzioni dettagliate (il procedimento)
+  late TextEditingController _preparazioneController; 
+  
+  /// Controller per i minuti stimati di preparazione
+  late TextEditingController _tempoPreparazioneController; 
+  
+  /// Controller per il numero di porzioni (es. "2 persone")
+  late TextEditingController _quantitaController; 
+  
+  /// Controller per eventuali suggerimenti e annotazioni opzionali
+  late TextEditingController _noteController; 
+  
+  /// Lista dinamica che mantiene lo stato di tutte le righe di ingredienti visibili
+  final List<_IngredienteRiga> _ingredientiRighe = []; 
 
-  String?
-  _categoriaSelezionata; // Memorizza la categoria scelta dal menù a tendina
-  int _difficoltaSelezionata = 1; // Fiammelle da 1 a 5 (default 1)
+  /// Memorizza temporaneamente la categoria selezionata dal DropdownButton
+  String? _categoriaSelezionata; 
+  
+  /// Valore della difficoltà espresso da 1 a 5. Di default è 1.
+  int _difficoltaSelezionata = 1; 
 
-  // Proprietà helper per capire se stiamo creando una nuova ricetta o modificandone una esistente
+  /// Getter di comodità per stabilire in modo leggibile se siamo in modalità Modifica.
+  /// Ritorna `true` se al costruttore del widget padre è stata passata una ricetta esistente.
   bool get eModalitaModifica => widget.ricetta != null;
 
-  // Inizializza lo stato e riempie i campi di testo se stiamo modificando una ricetta esistente
+  /// Inizializza lo stato del componente.
+  /// Se stiamo modificando, pre-popola tutti i [TextEditingController] con i dati preesistenti.
+  /// Altrimenti li inizializza vuoti.
   @override
   void initState() {
     super.initState();
-    _titoloController = TextEditingController(
-      text: widget.ricetta?.titolo ?? '',
-    );
-    _preparazioneController = TextEditingController(
-      text: widget.ricetta?.preparazione ?? '',
-    );
-    _tempoPreparazioneController = TextEditingController(
-      text: widget.ricetta?.tempoPreparazione ?? '',
-    );
-    _quantitaController = TextEditingController(
-      text: widget.ricetta?.quantita ?? '',
-    );
+    _titoloController = TextEditingController(text: widget.ricetta?.titolo ?? '');
+    _preparazioneController = TextEditingController(text: widget.ricetta?.preparazione ?? '');
+    _tempoPreparazioneController = TextEditingController(text: widget.ricetta?.tempoPreparazione ?? '');
+    _quantitaController = TextEditingController(text: widget.ricetta?.quantita ?? '');
     _noteController = TextEditingController(text: widget.ricetta?.note ?? '');
     _difficoltaSelezionata = widget.ricetta?.difficolta ?? 1;
 
-    // Inizializza i controller per gli ingredienti
+    // Gestione Iniziale Ingredienti:
     if (widget.ricetta != null && widget.ricetta!.ingredienti.isNotEmpty) {
-      // Se la ricetta esiste già, leggiamo i vecchi ingredienti e creiamo una riga per ciascuno
+      // Caso 1: Modifica ricetta. Iteriamo su tutti i vecchi ingredienti e creiamo i controller per l'interfaccia.
       for (var ing in widget.ricetta!.ingredienti) {
         final riga = _IngredienteRiga();
         riga.nomeCtrl.text = ing.nome;
         riga.quantitaCtrl.text = ing.quantita;
 
-        // Mettiamo un controllo di sicurezza per non far schiantare il menu a tendina se il valore è vecchio o corrotto
+        // Implementiamo una logica di tolleranza all'errore per le unità di misura.
+        // Se il valore nel database non corrisponde a nessuno dei valori ammessi nel menù a tendina, 
+        // lo facciamo ricadere (fallback) sul valore sicuro 'altro' per non generare un crash dell'app.
         riga.unitaMisura = ing.unitaMisura.isEmpty
             ? 'g'
-            : ([
-                    'g',
-                    'kg',
-                    'ml',
-                    'L',
-                    'pz',
-                    'cucchiai',
-                    'q.b.',
-                    'fette',
-                    'spicchio',
-                    'cespo',
-                    'tazza',
-                    'foglie',
-                    'costa',
-                    'bustina',
-                    'altro',
-                  ].contains(ing.unitaMisura)
-                  ? ing.unitaMisura
-                  : 'altro');
+            : (['g', 'kg', 'ml', 'L', 'pz', 'cucchiai', 'q.b.', 'fette', 'spicchio', 'cespo', 'tazza', 'foglie', 'costa', 'bustina', 'altro']
+                .contains(ing.unitaMisura) ? ing.unitaMisura : 'altro');
         _ingredientiRighe.add(riga);
       }
     } else {
-      _ingredientiRighe.add(_IngredienteRiga()); // Almeno uno vuoto
+      // Caso 2: Nuova ricetta. Inseriamo subito una riga vuota pronta all'uso.
+      _ingredientiRighe.add(_IngredienteRiga());
     }
 
     _categoriaSelezionata = widget.ricetta?.categoria;
   }
 
-  // Libera la memoria chiudendo tutti i controller quando la schermata viene chiusa
+  /// Override del metodo dispose: chiamato prima che il widget venga distrutto in modo permanente.
+  /// Scopo critico: pulire la RAM deallocando tutti i controller di testo e le relative righe figlie.
   @override
   void dispose() {
     _titoloController.dispose();
@@ -134,29 +127,32 @@ class _RicetteModificaViewState extends State<RicetteModificaView> {
     super.dispose();
   }
 
-  // Aggiunge una nuova riga vuota per permettere l'inserimento di un ingrediente extra
+  /// Metodo invocato quando l'utente clicca sul pulsante "+" per aggiungere ingredienti extra.
+  /// Triggera un [setState] che spinge Flutter a ridisegnare la lista `_ingredientiRighe`.
   void _aggiungiIngrediente() {
     setState(() {
       _ingredientiRighe.add(_IngredienteRiga());
     });
   }
 
-  // Rimuove la riga di un ingrediente e si assicura che ne rimanga sempre almeno una vuota
+  /// Cancella uno specifico ingrediente dall'elenco basandosi sul suo `index`.
+  /// Se l'utente rimuove l'ultimo ingrediente disponibile, rimpiazziamo immediatamente
+  /// con uno nuovo vuoto, per evitare bug di interfaccia (nessun form visibile).
   void _rimuoviIngrediente(int index) {
     setState(() {
-      _ingredientiRighe[index].dispose();
+      _ingredientiRighe[index].dispose(); // Pulizia risorsa singola
       _ingredientiRighe.removeAt(index);
+      
+      // Meccanismo di sicurezza: ci deve essere sempre almeno una riga compilabile
       if (_ingredientiRighe.isEmpty) {
         _ingredientiRighe.add(_IngredienteRiga());
       }
     });
   }
 
-  // Mostra un popup di conferma quando l'utente preme il tasto rosso di eliminazione della ricetta
-  void _mostraConfermaEliminazione(
-    BuildContext context,
-    RicetteViewModel viewModel,
-  ) {
+  /// Helper Dialog: Mostra un pop-up di avviso prima di eliminare definitivamente una ricetta.
+  /// Contiene logica di pulizia aggiuntiva collegata ai pasti pianificati.
+  void _mostraConfermaEliminazione(BuildContext context, RicetteViewModel viewModel) {
     showDialog(
       context: context,
       builder: (BuildContext ctx) {
@@ -171,10 +167,7 @@ class _RicetteModificaViewState extends State<RicetteModificaView> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx),
-              child: const Text(
-                'Annulla',
-                style: TextStyle(color: AppStyle.coloreTestoSecondario),
-              ),
+              child: const Text('Annulla', style: TextStyle(color: AppStyle.coloreTestoSecondario)),
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
@@ -182,11 +175,15 @@ class _RicetteModificaViewState extends State<RicetteModificaView> {
                 foregroundColor: AppStyle.coloreBianco,
               ),
               onPressed: () {
+                // Azione Distruttiva:
+                // 1. Eliminiamo fisicamente la ricetta dalla base di dati in memoria.
                 viewModel.rimuoviRicetta(widget.ricetta!.id);
-                Provider.of<PianoPastiViewModel>(
-                  context,
-                  listen: false,
-                ).rimuoviRiferimentiRicetta(widget.ricetta!.id);
+                // 2. IMPORTANTISSIMO: Se la ricetta era stata precedentemente programmata nel calendario,
+                // rimuoviamo il collegamento dai PastiPianificati (Effetto Cascata) per evitare crash
+                // derivati da RecipeNotFound exceptions.
+                Provider.of<PianoPastiViewModel>(context, listen: false).rimuoviRiferimentiRicetta(widget.ricetta!.id);
+                
+                // Rimuoviamo il pop-up e poi usciamo dalla schermata di modifica
                 Navigator.pop(ctx);
                 Navigator.pop(context);
               },

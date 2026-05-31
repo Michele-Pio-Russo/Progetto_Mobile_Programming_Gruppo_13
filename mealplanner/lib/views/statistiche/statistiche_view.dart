@@ -7,6 +7,9 @@ import '../../viewmodels/ricette_viewmodel.dart';
 import '../../viewmodels/dispensa_viewmodel.dart';
 import '../../viewmodels/piano_pasti_viewmodel.dart';
 
+/// Schermata che visualizza le statistiche generali dell'app.
+/// Aggrega e mostra metriche importanti basate sui dati dei ViewModel:
+/// ricette salvate, prodotti in scadenza, pasti pianificati, e ingredienti mancanti.
 class StatisticheView extends StatelessWidget {
   const StatisticheView({super.key});
 
@@ -22,6 +25,7 @@ class StatisticheView extends StatelessWidget {
     final articoli = dispensaVM.articoli;    // Tutti gli ingredienti presenti in dispensa
     
     // Ricette per categoria e calcolo della categoria più usata
+    // Creiamo una mappa che associa ogni categoria al numero di ricette che vi appartengono
     final catMap = <String, int>{}; // Mappa {NomeCategoria: Conteggio}
     for (final r in ricette) {
       catMap[r.categoria] = (catMap[r.categoria] ?? 0) + 1;
@@ -35,11 +39,12 @@ class StatisticheView extends StatelessWidget {
       categoriaPiuUsata = entries.first.key; 
     }
 
-    // Tempo medio di preparazione
+    // Tempo medio di preparazione di tutte le ricette salvate
     double avgPrepTime = 0; // In minuti
     if (ricette.isNotEmpty) {
       double totalTime = 0;
       for (final r in ricette) {
+        // Tentiamo il parsing in double, ignorando eventuali stringhe non numeriche
         totalTime += double.tryParse(r.tempoPreparazione) ?? 0;
       }
       avgPrepTime = totalTime / ricette.length;
@@ -60,11 +65,13 @@ class StatisticheView extends StatelessWidget {
     // Pasti pianificati nella settimana corrente
     final weeklyMealsCount = pianoPastiVM.numeroPastiPianificati;
 
-    // Prodotti in scadenza nei prossimi 7 giorni
+    // Prodotti in scadenza nei prossimi 7 giorni.
+    // Calcoliamo la data odierna ignorando l'ora per confronti precisi.
     final oggi = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
     
+    // Filtriamo gli articoli della dispensa per trovare quelli critici
     final expiringItems = articoli.where((art) {
-      // Tiene conto solo di prodotti con quantità > 0 e in scadenza a breve
+      // Tiene conto solo di prodotti con quantità > 0 e in scadenza a breve (tra 0 e 7 giorni)
       if (art.scadenza != null && art.quantita > 0) {
         final diff = art.scadenza!.difference(oggi).inDays;
         return diff >= 0 && diff <= 7;
@@ -72,31 +79,35 @@ class StatisticheView extends StatelessWidget {
       return false;
     }).toList();
 
-    // Ingredienti mancanti rispetto al piano pasti odierno
+    // Logica complessa: calcolo degli ingredienti mancanti rispetto al piano pasti odierno.
+    // 1. Identifichiamo il giorno della settimana corrente
     final dayOfWeek = _getGiornoOdierno();
+    // 2. Filtriamo i pasti programmati per la giornata di oggi
     final pastiOggi = pianoPastiVM.pastiEffettivi.where((p) => p.giorno == dayOfWeek).toList();
     
-    // Somma gli ingredienti richiesti oggi
+    // 3. Somma totale delle quantità degli ingredienti richiesti oggi
     final ingredientiRichiesti = <String, double>{};
     for (final pasto in pastiOggi) {
       final ricetta = ricetteVM.ottieniRicettaPerId(pasto.idRicetta);
       if (ricetta != null) {
         for (final ing in ricetta.ingredienti) {
-          final qta = double.tryParse(ing.quantita) ?? 1.0;
+          final qta = double.tryParse(ing.quantita) ?? 1.0; // Assumiamo 1.0 se non è parsabile
           ingredientiRichiesti[ing.nome] = (ingredientiRichiesti[ing.nome] ?? 0) + qta;
         }
       }
     }
 
-    // Confronta il richiesto con ciò che c'è in dispensa
+    // 4. Confronta la quantità totale richiesta con ciò che c'è attualmente in dispensa
     int ingredientiMancantiCount = 0; // Contatore finale degli ingredienti mancanti
     for (final entry in ingredientiRichiesti.entries) {
+      // Cerca in dispensa ingredienti con nome simile (ignorando le maiuscole/minuscole)
       final inDispensa = articoli.where((a) => a.nome.toLowerCase() == entry.key.toLowerCase());
       double qtaInDispensa = 0;
       for (final a in inDispensa) {
         qtaInDispensa += a.quantita; 
       }
       
+      // Se abbiamo meno quantità in dispensa rispetto a quella richiesta dalle ricette, segnaliamo la mancanza
       if (qtaInDispensa < entry.value) {
         ingredientiMancantiCount++;
       }
@@ -322,6 +333,8 @@ class StatisticheView extends StatelessWidget {
     );
   }
 
+  /// Metodo di utilità per ricavare il nome del giorno della settimana attuale.
+  /// Ritorna una stringa formattata compatibile con quelle salvate nel piano pasti.
   String _getGiornoOdierno() {
     switch (DateTime.now().weekday) {
       case 1: return 'Lunedì';
@@ -345,6 +358,8 @@ class StatisticheView extends StatelessWidget {
     Colors.teal,
   ];
 
+  /// Costruisce i dati per ogni sezione del grafico a torta.
+  /// Associa un colore ciclico dalla lista `_chartColors` in base al valore.
   List<PieChartSectionData> _buildPieSections(Map<String, int> catMap) {
     int i = 0;
     final entries = catMap.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
@@ -360,6 +375,8 @@ class StatisticheView extends StatelessWidget {
     }).toList();
   }
 
+  /// Costruisce la legenda posta accanto al grafico a torta.
+  /// Calcola anche la percentuale di ogni singola voce rispetto al totale.
   List<Widget> _buildLegend(Map<String, int> catMap) {
     int total = catMap.values.fold(0, (sum, val) => sum + val);
     int i = 0;

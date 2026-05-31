@@ -3,14 +3,16 @@ import '../../models/ricette_model.dart';
 import '../../theme/style.dart';
 
 
-// Schermata che mostra i dettagli e le istruzioni di una singola ricetta in sola lettura
+/// Schermata di visualizzazione in sola lettura.
+/// Mostra tutti i dettagli di una singola [Ricette] passata al costruttore,
+/// includendo categoria, tempo, difficoltà, lista degli ingredienti formattata e procedimento.
 class RicetteDettaglioView extends StatelessWidget {
-  final Ricette ricetta; // La ricetta di cui stiamo visualizzando i dettagli
+  /// L'oggetto ricetta di cui mostrare i dettagli.
+  final Ricette ricetta;
 
-  // Costruttore della schermata di dettaglio, richiede la ricetta da visualizzare
+  /// Costruttore che richiede obbligatoriamente l'oggetto [ricetta]
   const RicetteDettaglioView({super.key, required this.ricetta});
 
-  // Costruisce l'interfaccia principale mostrando titolo, dettagli, ingredienti e procedimento
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -100,7 +102,8 @@ class RicetteDettaglioView extends StatelessWidget {
     );
   }
 
-  // Helper method: Costruisce un piccolo blocco grafico con un'icona e un testo (usato per tempo e quantità)
+  /// Costruisce una piccola colonna contenente un'icona e una label di testo.
+  /// È utilizzata per la sezione di informazioni rapide (es. tempo di preparazione e porzioni).
   Widget _buildInfoBadge(IconData icon, String label) {
     return Expanded(
       child: Column(
@@ -113,16 +116,20 @@ class RicetteDettaglioView extends StatelessWidget {
     );
   }
 
-  // Helper method: Costruisce il blocco grafico speciale per mostrare le fiammelle della difficoltà
+  /// Costruisce il badge per la difficoltà della ricetta.
+  /// Disegna fino a 5 fiammelle e colora di arancione un numero di fiammelle pari a [difficolta],
+  /// lasciando le restanti grigie e traslucide.
   Widget _buildDifficoltaBadge(int difficolta) {
     return Expanded(
       child: Column(
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
+            // Genera una lista di 5 widget Icon (le fiammelle)
             children: List.generate(5, (index) {
               return Icon(
                 Icons.local_fire_department_outlined,
+                // index va da 0 a 4. Se è minore della difficoltà (1-5), accendiamo la fiamma
                 color: index < difficolta ? Colors.orange : AppStyle.coloreTestoSecondario.withValues(alpha: 0.2),
                 size: 24,
               );
