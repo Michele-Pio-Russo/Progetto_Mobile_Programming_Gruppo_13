@@ -15,7 +15,7 @@ class AppStyle {
 
   static List<BoxShadow> ombraNuvola = [
     BoxShadow(
-      color: coloreTestoPrincipale.withOpacity(0.04), // 4% di opacità, leggerissima
+      color: coloreTestoPrincipale.withValues(alpha: 0.04), // 4% di opacità, leggerissima
       blurRadius: 24, // Molto diffusa
       spreadRadius: 0,
       offset: const Offset(0, 8), // Leggermente verso il basso

@@ -37,6 +37,16 @@ android {
             signingConfig = signingConfigs.getByName("debug")
         }
     }
+
+    // Blocco aggiunto per rinominare l'APK generato
+    applicationVariants.all {
+        val variant = this
+        outputs.all {
+            // In Kotlin DSL dobbiamo specificare il tipo di output per modificarne il nome
+            val outputImpl = this as com.android.build.gradle.internal.api.BaseVariantOutputImpl
+            outputImpl.outputFileName = "MealPlanner-${variant.versionName}.apk"
+        }
+    }
 }
 
 flutter {

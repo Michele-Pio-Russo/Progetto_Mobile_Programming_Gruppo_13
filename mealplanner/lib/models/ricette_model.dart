@@ -99,10 +99,15 @@ class Ricette {
         diffParsed = diffRaw;
       } else if (diffRaw is String) {
         // Se è una stringa (es. vecchi dati salvati), la mappiamo al numero corrispondente di fiammelle
-        if (diffRaw == 'Facile') diffParsed = 1;
-        else if (diffRaw == 'Media') diffParsed = 3;
-        else if (diffRaw == 'Difficile') diffParsed = 5;
-        else diffParsed = int.tryParse(diffRaw) ?? 1; // Tentativo di conversione finale
+        if (diffRaw == 'Facile') {
+          diffParsed = 1;
+        } else if (diffRaw == 'Media') {
+          diffParsed = 3;
+        } else if (diffRaw == 'Difficile') {
+          diffParsed = 5;
+        } else {
+          diffParsed = int.tryParse(diffRaw) ?? 1; // Tentativo di conversione finale
+        }
       }
     }
 
@@ -120,10 +125,15 @@ class Ricette {
     }
 
     String cat = json['categoria'] ?? 'Altro';
-    if (cat == 'Primi Piatti') cat = 'Primo Piatto';
-    else if (cat == 'Secondi Piatti') cat = 'Secondo Piatto';
-    else if (cat == 'Dolci') cat = 'Dolce';
-    else if (!categorie.contains(cat)) cat = 'Altro';
+    if (cat == 'Primi Piatti') {
+      cat = 'Primo Piatto';
+    } else if (cat == 'Secondi Piatti') {
+      cat = 'Secondo Piatto';
+    } else if (cat == 'Dolci') {
+      cat = 'Dolce';
+    } else if (!categorie.contains(cat)) {
+      cat = 'Altro';
+    }
 
     return Ricette(
       id: json['id'],

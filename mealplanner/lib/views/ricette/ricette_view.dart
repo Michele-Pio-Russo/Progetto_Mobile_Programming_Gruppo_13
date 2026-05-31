@@ -109,7 +109,7 @@ class _RicetteViewState extends State<RicetteView> {
                           AppStyle.raggioBottoni,
                         ),
                         borderSide: BorderSide(
-                          color: AppStyle.coloreTestoSecondario.withOpacity(
+                          color: AppStyle.coloreTestoSecondario.withValues(alpha: 
                             0.2,
                           ),
                         ),
@@ -119,7 +119,7 @@ class _RicetteViewState extends State<RicetteView> {
                           AppStyle.raggioBottoni,
                         ),
                         borderSide: BorderSide(
-                          color: AppStyle.coloreTestoSecondario.withOpacity(
+                          color: AppStyle.coloreTestoSecondario.withValues(alpha: 
                             0.2,
                           ),
                         ),
@@ -141,7 +141,7 @@ class _RicetteViewState extends State<RicetteView> {
                           AppStyle.raggioBottoni,
                         ),
                         borderSide: BorderSide(
-                          color: AppStyle.coloreTestoSecondario.withOpacity(
+                          color: AppStyle.coloreTestoSecondario.withValues(alpha: 
                             0.2,
                           ),
                         ),
@@ -151,7 +151,7 @@ class _RicetteViewState extends State<RicetteView> {
                           AppStyle.raggioBottoni,
                         ),
                         borderSide: BorderSide(
-                          color: AppStyle.coloreTestoSecondario.withOpacity(
+                          color: AppStyle.coloreTestoSecondario.withValues(alpha: 
                             0.2,
                           ),
                         ),
@@ -279,7 +279,7 @@ class _RicetteViewState extends State<RicetteView> {
                             width: 50,
                             height: 50,
                             decoration: BoxDecoration(
-                              color: AppStyle.coloreTestoSecondario.withOpacity(
+                              color: AppStyle.coloreTestoSecondario.withValues(alpha: 
                                 0.1,
                               ),
                               borderRadius: BorderRadius.circular(12),
@@ -289,88 +289,86 @@ class _RicetteViewState extends State<RicetteView> {
                               color: AppStyle.coloreTestoSecondario,
                             ),
                           ),
-                          title: Row(
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  ricetta.titolo,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                              // Se è una ricetta di sistema, mostriamo un piccolo badge "Predefinita"
-                              if (ricetta.isPredefinita)
-                                Container(
-                                  margin: const EdgeInsets.only(left: 8),
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 6,
-                                    vertical: 2,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: Colors.amber.withOpacity(0.1),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: const Text(
-                                    '⭐ Predefinita',
-                                    style: TextStyle(
-                                      fontSize: 10,
-                                      color: Colors.orange,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                            ],
-                          ),
-                          subtitle: Text(
-                            ricetta.preparazione,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
+                          title: Text(
+                            ricetta.titolo,
                             style: const TextStyle(
-                              fontSize: 12,
-                              color: AppStyle.coloreTestoSecondario,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
-                          trailing: Row(
-                            mainAxisSize: MainAxisSize.min,
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                  vertical: 4,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: AppStyle.colorePrimario.withOpacity(
-                                    0.1,
-                                  ),
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: Text(
-                                  ricetta.categoria,
-                                  style: const TextStyle(
-                                    color: AppStyle.colorePrimario,
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                              IconButton(
-                                icon: const Icon(
-                                  Icons.edit_outlined,
+                              const SizedBox(height: 4),
+                              Text(
+                                ricetta.preparazione,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontSize: 12,
                                   color: AppStyle.coloreTestoSecondario,
                                 ),
-                                onPressed: () {
-                                  // Cliccando la matita navighiamo direttamente alla schermata di modifica
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          RicetteModificaView(ricetta: ricetta),
+                              ),
+                              const SizedBox(height: 8),
+                              Wrap(
+                                spacing: 8,
+                                runSpacing: 4,
+                                children: [
+                                  if (ricetta.isPredefinita)
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                        vertical: 4,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Colors.amber.withValues(alpha: 0.1),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: const Text(
+                                        '⭐ Predefinita',
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          color: Colors.orange,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
                                     ),
-                                  );
-                                },
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 4,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: AppStyle.colorePrimario.withValues(alpha: 0.1),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Text(
+                                      ricetta.categoria,
+                                      style: const TextStyle(
+                                        color: AppStyle.colorePrimario,
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
+                          ),
+                          trailing: IconButton(
+                            icon: const Icon(
+                              Icons.edit_outlined,
+                              color: AppStyle.coloreTestoSecondario,
+                            ),
+                            onPressed: () {
+                              // Cliccando la matita navighiamo direttamente alla schermata di modifica
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      RicetteModificaView(ricetta: ricetta),
+                                ),
+                              );
+                            },
                           ),
                         ),
                       );

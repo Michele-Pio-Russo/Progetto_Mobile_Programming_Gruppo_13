@@ -63,11 +63,11 @@ class _SchermataDispensaState extends State<SchermataDispensa> {
                       prefixIcon: const Icon(Icons.search_outlined, color: AppStyle.coloreTestoSecondario),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(AppStyle.raggioBottoni),
-                        borderSide: BorderSide(color: AppStyle.coloreTestoSecondario.withOpacity(0.2)),
+                        borderSide: BorderSide(color: AppStyle.coloreTestoSecondario.withValues(alpha: 0.2)),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(AppStyle.raggioBottoni),
-                        borderSide: BorderSide(color: AppStyle.coloreTestoSecondario.withOpacity(0.2)),
+                        borderSide: BorderSide(color: AppStyle.coloreTestoSecondario.withValues(alpha: 0.2)),
                       ),
                       contentPadding: const EdgeInsets.symmetric(vertical: 0),
                     ),
@@ -82,11 +82,11 @@ class _SchermataDispensaState extends State<SchermataDispensa> {
                     decoration: InputDecoration(
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(AppStyle.raggioBottoni),
-                        borderSide: BorderSide(color: AppStyle.coloreTestoSecondario.withOpacity(0.2)),
+                        borderSide: BorderSide(color: AppStyle.coloreTestoSecondario.withValues(alpha: 0.2)),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(AppStyle.raggioBottoni),
-                        borderSide: BorderSide(color: AppStyle.coloreTestoSecondario.withOpacity(0.2)),
+                        borderSide: BorderSide(color: AppStyle.coloreTestoSecondario.withValues(alpha: 0.2)),
                       ),
                       contentPadding: const EdgeInsets.symmetric(horizontal: 10),
                     ),
@@ -159,7 +159,7 @@ class _SchermataDispensaState extends State<SchermataDispensa> {
                             width: 50,
                             height: 50,
                             decoration: BoxDecoration(
-                              color: AppStyle.coloreTestoSecondario.withOpacity(0.1),
+                              color: AppStyle.coloreTestoSecondario.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: const Icon(Icons.fastfood_outlined, color: AppStyle.coloreTestoSecondario),
@@ -198,7 +198,7 @@ class _SchermataDispensaState extends State<SchermataDispensa> {
         elevation: 0,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppStyle.raggioBottoni)),
         side: BorderSide(
-          color: selezionato ? Colors.transparent : AppStyle.coloreTestoSecondario.withOpacity(0.2),
+          color: selezionato ? Colors.transparent : AppStyle.coloreTestoSecondario.withValues(alpha: 0.2),
         ),
       ),
       onPressed: () {
@@ -213,16 +213,16 @@ class _SchermataDispensaState extends State<SchermataDispensa> {
   // Widget per creare le etichette arrotondate
   Widget _costruisciBadgeStato(Dispensa articolo) {
     String testo = 'OK';
-    Color coloreSfondo = AppStyle.coloreTestoSecondario.withOpacity(0.1);
+    Color coloreSfondo = AppStyle.coloreTestoSecondario.withValues(alpha: 0.1);
     Color coloreTesto = AppStyle.coloreTestoSecondario;
 
     if (articolo.quantita <= 0) {
       testo = 'In esaurimento';
-      coloreSfondo = AppStyle.coloreErrore.withOpacity(0.1);
+      coloreSfondo = AppStyle.coloreErrore.withValues(alpha: 0.1);
       coloreTesto = AppStyle.coloreErrore;
     } else if (articolo.statoCritico) {
       testo = 'In scadenza';
-      coloreSfondo = Colors.orange.withOpacity(0.1);
+      coloreSfondo = Colors.orange.withValues(alpha: 0.1);
       coloreTesto = Colors.orange.shade700;
     }
 

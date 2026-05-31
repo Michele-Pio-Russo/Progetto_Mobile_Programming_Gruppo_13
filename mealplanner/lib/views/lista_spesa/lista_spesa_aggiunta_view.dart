@@ -131,7 +131,7 @@ class _SchermataAggiuntaSpesaState extends State<SchermataAggiuntaSpesa> {
                       ),
                       const SizedBox(height: 8),
                       DropdownButtonFormField<String>(
-                        value: _unitaSelezionata,
+                        initialValue: _unitaSelezionata,
                         decoration: InputDecoration(
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(AppStyle.raggioBottoni),

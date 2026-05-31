@@ -148,9 +148,9 @@ class _SchermataModificaPianoPastiState
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: AppStyle.coloreTestoSecondario.withOpacity(0.05),
+                  color: AppStyle.coloreTestoSecondario.withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(AppStyle.raggioBottoni),
-                  border: Border.all(color: AppStyle.coloreTestoSecondario.withOpacity(0.2)),
+                  border: Border.all(color: AppStyle.coloreTestoSecondario.withValues(alpha: 0.2)),
                 ),
                 child: Row(
                   children: [
@@ -177,7 +177,7 @@ class _SchermataModificaPianoPastiState
               
               // Menu a tendina per scegliere se è Colazione, Pranzo, ecc.
               DropdownButtonFormField<String>(
-                value: _tipologiaSelezionata,
+                initialValue: _tipologiaSelezionata,
                 hint: const Text('Seleziona la tipologia'),
                 decoration: InputDecoration(
                   border: OutlineInputBorder(
@@ -209,9 +209,9 @@ class _SchermataModificaPianoPastiState
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: AppStyle.coloreTestoSecondario.withOpacity(0.05),
+                  color: AppStyle.coloreTestoSecondario.withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(AppStyle.raggioBottoni),
-                  border: Border.all(color: AppStyle.coloreTestoSecondario.withOpacity(0.2)),
+                  border: Border.all(color: AppStyle.coloreTestoSecondario.withValues(alpha: 0.2)),
                 ),
                 child: Row(
                   children: [
@@ -240,7 +240,7 @@ class _SchermataModificaPianoPastiState
             
             // Menu a tendina per scegliere la ricetta
             DropdownButtonFormField<String>(
-              value: _idRicettaSelezionata,
+              initialValue: _idRicettaSelezionata,
               hint: const Text('Tocca per scegliere una ricetta...'),
               decoration: InputDecoration(
                 border: OutlineInputBorder(

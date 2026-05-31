@@ -203,11 +203,12 @@ class _RicetteModificaViewState extends State<RicetteModificaView> {
   Widget build(BuildContext context) {
     final viewModel = Provider.of<RicetteViewModel>(context, listen: false);
 
-    return WillPopScope(
-      // WillPopScope serve per intercettare quando l'utente preme il tasto indietro del telefono (o fa lo swipe)
-      onWillPop: () async {
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (bool didPop, Object? result) async {
+        if (didPop) return;
         // Mostriamo un dialogo per chiedere conferma se davvero si vuole uscire perdendo le modifiche
-        return await showDialog(
+        final bool shouldPop = await showDialog(
               context: context,
               builder: (context) => AlertDialog(
                 title: const Text('Scartare le modifiche?'),
@@ -241,6 +242,10 @@ class _RicetteModificaViewState extends State<RicetteModificaView> {
               ),
             ) ??
             false; // Se il dialogo viene chiuso toccando fuori, blocca l'uscita per sicurezza
+            
+        if (shouldPop && context.mounted) {
+          Navigator.of(context).pop();
+        }
       },
       child: Scaffold(
         appBar: AppBar(
@@ -319,7 +324,7 @@ class _RicetteModificaViewState extends State<RicetteModificaView> {
                         Icons.local_fire_department_outlined,
                         color: index < _difficoltaSelezionata
                             ? Colors.orange
-                            : AppStyle.coloreTestoSecondario.withOpacity(0.2),
+                            : AppStyle.coloreTestoSecondario.withValues(alpha: 0.2),
                         size: 32,
                       ),
                       onPressed: () {
@@ -434,7 +439,7 @@ class _RicetteModificaViewState extends State<RicetteModificaView> {
                         Expanded(
                           flex: 2,
                           child: DropdownButtonFormField<String>(
-                            value: riga.unitaMisura,
+                            initialValue: riga.unitaMisura,
                             decoration: InputDecoration(
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(AppStyle.raggioBottoni),
@@ -472,8 +477,9 @@ class _RicetteModificaViewState extends State<RicetteModificaView> {
                                   );
                                 }).toList(),
                             onChanged: (val) {
-                              if (val != null)
+                              if (val != null) {
                                 setState(() => riga.unitaMisura = val);
+                              }
                             },
                           ),
                         ),
@@ -493,7 +499,7 @@ class _RicetteModificaViewState extends State<RicetteModificaView> {
                   alignment: Alignment.centerRight,
                   child: ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppStyle.coloreTestoSecondario.withOpacity(0.1),
+                      backgroundColor: AppStyle.coloreTestoSecondario.withValues(alpha: 0.1),
                       foregroundColor: AppStyle.coloreTestoPrincipale,
                       elevation: 0,
                       shape: RoundedRectangleBorder(

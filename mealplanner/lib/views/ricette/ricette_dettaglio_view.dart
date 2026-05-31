@@ -28,7 +28,7 @@ class RicetteDettaglioView extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                color: AppStyle.colorePrimario.withOpacity(0.1),
+                color: AppStyle.colorePrimario.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(AppStyle.raggioBottoni),
               ),
               child: Text(
@@ -85,9 +85,9 @@ class RicetteDettaglioView extends StatelessWidget {
                 width: double.infinity,
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: AppStyle.coloreTestoSecondario.withOpacity(0.05),
+                  color: AppStyle.coloreTestoSecondario.withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppStyle.coloreTestoSecondario.withOpacity(0.2)),
+                  border: Border.all(color: AppStyle.coloreTestoSecondario.withValues(alpha: 0.2)),
                 ),
                 child: Text(ricetta.note, style: const TextStyle(fontSize: 14, fontStyle: FontStyle.italic)),
               ),
@@ -123,7 +123,7 @@ class RicetteDettaglioView extends StatelessWidget {
             children: List.generate(5, (index) {
               return Icon(
                 Icons.local_fire_department_outlined,
-                color: index < difficolta ? Colors.orange : AppStyle.coloreTestoSecondario.withOpacity(0.2),
+                color: index < difficolta ? Colors.orange : AppStyle.coloreTestoSecondario.withValues(alpha: 0.2),
                 size: 24,
               );
             }),
