@@ -18,7 +18,7 @@ class GestoreDispensa extends ChangeNotifier {
     _inizializzaDati();
   }
 
-  /// Metodo per caricare i dati da SharedPreferences all'avvio
+  // Metodo per caricare i dati da SharedPreferences all'avvio
   Future<void> _inizializzaDati() async {
     final datiSalvati = await _servizio.caricaArticoli();
     _articoli.clear();
@@ -31,8 +31,8 @@ class GestoreDispensa extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Metodo di utilità per salvare lo stato attuale su disco.
-  /// Viene chiamato automaticamente dopo ogni modifica alla lista.
+  // Metodo di utilità per salvare lo stato attuale su disco.
+  // Viene chiamato automaticamente dopo ogni modifica alla lista.
   Future<void> _salvaSuDisco() async {
     await _servizio.salvaArticoli(_articoli);
   }
