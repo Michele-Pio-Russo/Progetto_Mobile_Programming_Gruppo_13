@@ -4,6 +4,8 @@ import '../../viewmodels/ricette_viewmodel.dart';
 import '../../models/ricette_model.dart';
 import 'ricette_modifica_view.dart';
 import 'ricette_dettaglio_view.dart';
+import '../../theme/style.dart';
+
 
 // Schermata principale che elenca tutte le ricette nel ricettacolo
 class RicetteView extends StatefulWidget {
@@ -58,12 +60,10 @@ class _RicetteViewState extends State<RicetteView> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Ricette', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.white,
-        elevation: 0,
+        title: const Text('Ricette'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.add, color: Colors.black, size: 28),
+            icon: const Icon(Icons.add_circle_outline),
             onPressed: () {
               Navigator.push(
                 context,
@@ -90,8 +90,15 @@ class _RicetteViewState extends State<RicetteView> {
                     },
                     decoration: InputDecoration(
                       hintText: 'Cerca...',
-                      prefixIcon: const Icon(Icons.search),
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                      prefixIcon: const Icon(Icons.search_outlined, color: AppStyle.coloreTestoSecondario),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(AppStyle.raggioBottoni),
+                        borderSide: BorderSide(color: AppStyle.coloreTestoSecondario.withOpacity(0.2)),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(AppStyle.raggioBottoni),
+                        borderSide: BorderSide(color: AppStyle.coloreTestoSecondario.withOpacity(0.2)),
+                      ),
                       contentPadding: const EdgeInsets.symmetric(vertical: 0),
                     ),
                   ),
@@ -102,7 +109,14 @@ class _RicetteViewState extends State<RicetteView> {
                   child: DropdownButtonFormField<String>(
                     initialValue: _categoriaSelezionata,
                     decoration: InputDecoration(
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(AppStyle.raggioBottoni),
+                        borderSide: BorderSide(color: AppStyle.coloreTestoSecondario.withOpacity(0.2)),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(AppStyle.raggioBottoni),
+                        borderSide: BorderSide(color: AppStyle.coloreTestoSecondario.withOpacity(0.2)),
+                      ),
                       contentPadding: const EdgeInsets.symmetric(horizontal: 10),
                     ),
                     items: ['Tutte', ...Ricette.categorie].map((String cat) {
@@ -138,7 +152,7 @@ class _RicetteViewState extends State<RicetteView> {
                       value: index + 1, 
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center, // Centra le fiammelle all'interno della riga
-                        children: List.generate(index + 1, (_) => const Icon(Icons.local_fire_department, color: Colors.orange, size: 16))
+                        children: List.generate(index + 1, (_) => const Icon(Icons.local_fire_department_outlined, color: Colors.orange, size: 16))
                       )
                     )),
                   ],
@@ -168,9 +182,16 @@ class _RicetteViewState extends State<RicetteView> {
                     itemCount: ricetteFiltrate.length, // Definisce quante righe generare dinamicamente
                     itemBuilder: (context, index) {
                       final ricetta = ricetteFiltrate[index]; // Estraggo la ricetta specifica per questa riga
-                      return Card(
+                      return Container(
                         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: AppStyle.coloreBianco,
+                          borderRadius: BorderRadius.circular(AppStyle.raggioCard),
+                          boxShadow: AppStyle.ombraNuvola,
+                        ),
                         child: ListTile(
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppStyle.raggioCard)),
                           onTap: () {
                             Navigator.push(
                               context,
@@ -182,8 +203,11 @@ class _RicetteViewState extends State<RicetteView> {
                           leading: Container(
                             width: 50,
                             height: 50,
-                            color: Colors.grey.shade200,
-                            child: const Icon(Icons.restaurant, color: Colors.grey),
+                            decoration: BoxDecoration(
+                              color: AppStyle.coloreTestoSecondario.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: const Icon(Icons.restaurant_outlined, color: AppStyle.coloreTestoSecondario),
                           ),
                           title: Row(
                             children: [
@@ -193,8 +217,11 @@ class _RicetteViewState extends State<RicetteView> {
                                 Container(
                                   margin: const EdgeInsets.only(left: 8),
                                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                  decoration: BoxDecoration(color: Colors.amber.shade100, borderRadius: BorderRadius.circular(8)),
-                                  child: Text('⭐ Predefinita', style: TextStyle(fontSize: 10, color: Colors.orange.shade800, fontWeight: FontWeight.bold)),
+                                  decoration: BoxDecoration(
+                                    color: Colors.amber.withOpacity(0.1), 
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: const Text('⭐ Predefinita', style: TextStyle(fontSize: 10, color: Colors.orange, fontWeight: FontWeight.bold)),
                                 ),
                             ],
                           ),
@@ -202,7 +229,7 @@ class _RicetteViewState extends State<RicetteView> {
                             ricetta.preparazione,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(fontSize: 12),
+                            style: const TextStyle(fontSize: 12, color: AppStyle.coloreTestoSecondario),
                           ),
                           trailing: Row(
                             mainAxisSize: MainAxisSize.min,
@@ -210,20 +237,20 @@ class _RicetteViewState extends State<RicetteView> {
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                                 decoration: BoxDecoration(
-                                  color: Colors.blue.shade100,
+                                  color: AppStyle.colorePrimario.withOpacity(0.1),
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 child: Text(
                                   ricetta.categoria,
-                                  style: TextStyle(
-                                    color: Colors.blue.shade700,
+                                  style: const TextStyle(
+                                    color: AppStyle.colorePrimario,
                                     fontSize: 11,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
                               ),
                               IconButton(
-                                icon: const Icon(Icons.edit, color: Colors.blue),
+                                icon: const Icon(Icons.edit_outlined, color: AppStyle.coloreTestoSecondario),
                                 onPressed: () {
                                   // Cliccando la matita navighiamo direttamente alla schermata di modifica
                                   Navigator.push(

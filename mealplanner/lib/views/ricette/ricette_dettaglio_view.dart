@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../models/ricette_model.dart';
+import '../../theme/style.dart';
+
 
 // Schermata che mostra i dettagli e le istruzioni di una singola ricetta in sola lettura
 class RicetteDettaglioView extends StatelessWidget {
@@ -13,10 +15,7 @@ class RicetteDettaglioView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Dettaglio Ricetta', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.black),
+        title: const Text('Dettaglio Ricetta'),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -29,12 +28,12 @@ class RicetteDettaglioView extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                color: Colors.blue.shade100,
-                borderRadius: BorderRadius.circular(12),
+                color: AppStyle.colorePrimario.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(AppStyle.raggioBottoni),
               ),
               child: Text(
                 ricetta.categoria,
-                style: TextStyle(color: Colors.blue.shade700, fontWeight: FontWeight.bold),
+                style: const TextStyle(color: AppStyle.colorePrimario, fontWeight: FontWeight.bold),
               ),
             ),
             const SizedBox(height: 20),
@@ -44,9 +43,9 @@ class RicetteDettaglioView extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 // Mostriamo il tempo aggiungendo "min" e la difficoltà usando il costruttore delle fiammelle
-                _buildInfoBadge(Icons.timer, '${ricetta.tempoPreparazione} min'),
+                _buildInfoBadge(Icons.timer_outlined, '${ricetta.tempoPreparazione} min'),
                 _buildDifficoltaBadge(ricetta.difficolta),
-                _buildInfoBadge(Icons.restaurant, ricetta.quantita),
+                _buildInfoBadge(Icons.restaurant_outlined, ricetta.quantita),
               ],
             ),
             const Divider(height: 40, thickness: 1),
@@ -58,7 +57,7 @@ class RicetteDettaglioView extends StatelessWidget {
                   padding: const EdgeInsets.only(bottom: 6.0),
                   child: Row(
                     children: [
-                      const Icon(Icons.circle, size: 8, color: Colors.grey),
+                      const Icon(Icons.circle, size: 8, color: AppStyle.colorePrimario),
                       const SizedBox(width: 10),
                       Expanded(
                         // Formattiamo gli ingredienti strutturati: omettiamo l'unità se è "altro"
@@ -86,9 +85,9 @@ class RicetteDettaglioView extends StatelessWidget {
                 width: double.infinity,
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.yellow.shade50,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.yellow.shade200),
+                  color: AppStyle.coloreTestoSecondario.withOpacity(0.05),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: AppStyle.coloreTestoSecondario.withOpacity(0.2)),
                 ),
                 child: Text(ricetta.note, style: const TextStyle(fontSize: 14, fontStyle: FontStyle.italic)),
               ),
@@ -106,7 +105,7 @@ class RicetteDettaglioView extends StatelessWidget {
     return Expanded(
       child: Column(
         children: [
-          Icon(icon, color: Colors.grey.shade700, size: 28),
+          Icon(icon, color: AppStyle.coloreTestoSecondario, size: 28),
           const SizedBox(height: 4),
           Text(label, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14), textAlign: TextAlign.center),
         ],
@@ -123,8 +122,8 @@ class RicetteDettaglioView extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: List.generate(5, (index) {
               return Icon(
-                Icons.local_fire_department,
-                color: index < difficolta ? Colors.orange : Colors.grey.shade300,
+                Icons.local_fire_department_outlined,
+                color: index < difficolta ? Colors.orange : AppStyle.coloreTestoSecondario.withOpacity(0.2),
                 size: 24,
               );
             }),

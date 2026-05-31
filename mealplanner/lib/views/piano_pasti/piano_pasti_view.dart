@@ -9,6 +9,8 @@ import 'piano_pasti_modifica_view.dart'; // <-- Assicurati che questo file si ch
 
 import '../ricette/ricette_dettaglio_view.dart';
 import '../../models/ricette_model.dart';
+import '../../theme/style.dart';
+
 
 class PianoPastiView extends StatefulWidget {
   const PianoPastiView({super.key});
@@ -44,16 +46,8 @@ class _PianoPastiViewState extends State<PianoPastiView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        title: const Text(
-          'Piano pasti',
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
-        ),
-        centerTitle: false,
-        iconTheme: const IconThemeData(color: Colors.black),
+        title: const Text('Piano pasti'),
         actions: [
           IconButton(
             icon: const Icon(Icons.calendar_today_outlined),
@@ -123,18 +117,18 @@ class _PianoPastiViewState extends State<PianoPastiView> {
                         .where((p) => p.giorno == giornoCorrente)
                         .toList();
 
-                    return Card(
+                    return Container(
                       margin: const EdgeInsets.symmetric(
                         horizontal: 16.0,
                         vertical: 8.0,
                       ),
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        side: BorderSide(color: Colors.grey.shade300, width: 1),
+                      decoration: BoxDecoration(
+                        color: AppStyle.coloreBianco,
+                        borderRadius: BorderRadius.circular(AppStyle.raggioCard),
+                        boxShadow: AppStyle.ombraNuvola,
                       ),
                       child: Padding(
-                        padding: const EdgeInsets.all(16.0),
+                        padding: const EdgeInsets.all(20.0),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -154,7 +148,7 @@ class _PianoPastiViewState extends State<PianoPastiView> {
                                     IconButton(
                                       icon: const Icon(
                                         Icons.add_circle_outline,
-                                        color: Colors.black54,
+                                        color: AppStyle.coloreTestoSecondario,
                                       ),
                                       onPressed: () {
                                         Navigator.push(
@@ -177,14 +171,15 @@ class _PianoPastiViewState extends State<PianoPastiView> {
                                     IconButton(
                                       icon: const Icon(
                                         Icons.more_vert,
-                                        color: Colors.grey,
+                                        color: AppStyle.coloreTestoSecondario,
                                       ),
                                       onPressed: () {
                                         showModalBottomSheet(
                                           context: context,
+                                          backgroundColor: AppStyle.coloreSfondo,
                                           shape: const RoundedRectangleBorder(
                                             borderRadius: BorderRadius.vertical(
-                                              top: Radius.circular(20),
+                                              top: Radius.circular(AppStyle.raggioCard),
                                             ),
                                           ),
                                           builder: (BuildContext context) {
@@ -217,7 +212,7 @@ class _PianoPastiViewState extends State<PianoPastiView> {
                                                       );
 
                                                       return ListTile(
-                                                        leading: const Icon(Icons.edit, color: Colors.grey),
+                                                        leading: const Icon(Icons.edit_outlined, color: AppStyle.coloreTestoSecondario),
                                                         title: Text(
                                                           tipologia,
                                                           style: const TextStyle(fontWeight: FontWeight.bold),
@@ -266,7 +261,7 @@ class _PianoPastiViewState extends State<PianoPastiView> {
                               );
 
                               return Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 4.0),
+                                padding: const EdgeInsets.symmetric(vertical: 6.0),
                                 child: Row(
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
@@ -284,7 +279,7 @@ class _PianoPastiViewState extends State<PianoPastiView> {
                                       child: Text(
                                         pasto.nomeRicetta,
                                         style: TextStyle(
-                                          color: pasto.nomeRicetta == '-' ? Colors.grey : Colors.black87,
+                                          color: pasto.nomeRicetta == '-' ? AppStyle.coloreTestoSecondario : AppStyle.coloreTestoPrincipale,
                                           fontSize: 14,
                                         ),
                                       ),
@@ -318,7 +313,7 @@ class _PianoPastiViewState extends State<PianoPastiView> {
                                           child: Icon(
                                             Icons.visibility_outlined,
                                             size: 20,
-                                            color: Colors.black54,
+                                            color: AppStyle.coloreTestoSecondario,
                                           ),
                                         ),
                                       ),

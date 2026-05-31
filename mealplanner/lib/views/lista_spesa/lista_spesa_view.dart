@@ -8,6 +8,8 @@ import '../../viewmodels/piano_pasti_viewmodel.dart';
 import '../../viewmodels/ricette_viewmodel.dart';
 import '../../viewmodels/dispensa_viewmodel.dart';
 import 'lista_spesa_aggiunta_view.dart';
+import '../../theme/style.dart';
+
 
 // Usiamo uno StatefulWidget perché dobbiamo tenere in memoria la data che l'utente seleziona dal calendario
 class ListaSpesaView extends StatefulWidget {
@@ -46,7 +48,7 @@ class _ListaSpesaViewState extends State<ListaSpesaView> {
               onPressed: () => Navigator.pop(context),
               child: const Text(
                 'Annulla',
-                style: TextStyle(color: Colors.grey),
+                style: TextStyle(color: AppStyle.coloreTestoSecondario),
               ),
             ),
             TextButton(
@@ -54,7 +56,7 @@ class _ListaSpesaViewState extends State<ListaSpesaView> {
                 viewModel.rimuoviProdottiComprati();
                 Navigator.pop(context);
               },
-              child: const Text('Rimuovi', style: TextStyle(color: Colors.red)),
+              child: const Text('Rimuovi', style: TextStyle(color: AppStyle.coloreErrore)),
             ),
           ],
         );
@@ -82,7 +84,7 @@ class _ListaSpesaViewState extends State<ListaSpesaView> {
               onPressed: () => Navigator.pop(context),
               child: const Text(
                 'Annulla',
-                style: TextStyle(color: Colors.grey),
+                style: TextStyle(color: AppStyle.coloreTestoSecondario),
               ),
             ),
             TextButton(
@@ -120,7 +122,7 @@ class _ListaSpesaViewState extends State<ListaSpesaView> {
               child: const Text(
                 'Genera',
                 style: TextStyle(
-                  color: Colors.black,
+                  color: AppStyle.colorePrimario,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -134,10 +136,7 @@ class _ListaSpesaViewState extends State<ListaSpesaView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -145,24 +144,21 @@ class _ListaSpesaViewState extends State<ListaSpesaView> {
               'Lista della Spesa',
               style: TextStyle(
                 fontWeight: FontWeight.bold,
-                color: Colors.black,
               ),
             ),
             Text(
               DateFormat('EEEE d MMMM yyyy', 'it_IT').format(_dataSelezionata),
               style: const TextStyle(
                 fontSize: 12,
-                color: Colors.grey,
+                color: AppStyle.coloreTestoSecondario,
                 fontWeight: FontWeight.w500,
               ),
             ),
           ],
         ),
-        centerTitle: false,
-        iconTheme: const IconThemeData(color: Colors.black),
         actions: [
           IconButton(
-            icon: const Icon(Icons.calendar_today_outlined, color: Colors.black),
+            icon: const Icon(Icons.calendar_today_outlined),
             onPressed: () async {
               // Apre il calendario di sistema per far scegliere una data
               DateTime? scelta = await showDatePicker(
@@ -179,7 +175,7 @@ class _ListaSpesaViewState extends State<ListaSpesaView> {
             },
           ),
           IconButton(
-            icon: const Icon(Icons.bolt, color: Colors.black),
+            icon: const Icon(Icons.bolt),
             onPressed: () => _mostraDialogConfermaGenerazione(context),
           ),
           // Usiamo un Consumer per il bottone del cestino: vogliamo che appaia solo se c'è almeno un prodotto già spuntato, altrimenti lo nascondiamo
@@ -189,7 +185,7 @@ class _ListaSpesaViewState extends State<ListaSpesaView> {
               if (!haProdottiComprati) return const SizedBox.shrink();
 
               return IconButton(
-                icon: const Icon(Icons.delete_sweep, color: Colors.black),
+                icon: const Icon(Icons.delete_sweep),
                 onPressed: () => _mostraDialogConferma(context, viewModel),
               );
             },
@@ -205,10 +201,12 @@ class _ListaSpesaViewState extends State<ListaSpesaView> {
             ),
           );
         },
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
-        elevation: 2,
-        shape: const CircleBorder(side: BorderSide(color: Colors.white30)),
+        backgroundColor: AppStyle.colorePrimario,
+        foregroundColor: AppStyle.coloreBianco,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppStyle.raggioBottoni),
+        ),
         child: const Icon(Icons.add, size: 28),
       ),
       // Questo Consumer ascolta ListaSpesaViewModel e ridisegna solo il corpo della pagina quando i prodotti cambiano
@@ -218,7 +216,7 @@ class _ListaSpesaViewState extends State<ListaSpesaView> {
             return const Center(
               child: Text(
                 'La lista della spesa è vuota.',
-                style: TextStyle(color: Colors.grey, fontSize: 16),
+                style: TextStyle(color: AppStyle.coloreTestoSecondario, fontSize: 16),
               ),
             );
           }
@@ -229,17 +227,21 @@ class _ListaSpesaViewState extends State<ListaSpesaView> {
             itemBuilder: (context, index) {
               final prodotto = viewModel.prodotti[index];
 
-              return Card(
-                elevation: 0,
-                margin: const EdgeInsets.only(bottom: 8.0),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  side: BorderSide(color: Colors.grey.shade300),
+              return Container(
+                margin: const EdgeInsets.only(bottom: 12.0),
+                decoration: BoxDecoration(
+                  color: AppStyle.coloreBianco,
+                  borderRadius: BorderRadius.circular(AppStyle.raggioCard),
+                  boxShadow: AppStyle.ombraNuvola,
                 ),
                 child: ListTile(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppStyle.raggioCard),
+                  ),
                   leading: Checkbox(
                     value: prodotto.comprato,
-                    activeColor: Colors.black,
+                    activeColor: AppStyle.colorePrimario,
                     onChanged: (bool? valore) {
                       viewModel.toggleComprato(prodotto.id);
                     },
@@ -252,20 +254,20 @@ class _ListaSpesaViewState extends State<ListaSpesaView> {
                       decoration: prodotto.comprato
                           ? TextDecoration.lineThrough
                           : TextDecoration.none,
-                      color: prodotto.comprato ? Colors.grey : Colors.black,
+                      color: prodotto.comprato ? AppStyle.coloreTestoSecondario : AppStyle.coloreTestoPrincipale,
                     ),
                   ),
                   subtitle: Text(
                     prodotto.quantita,
                     style: TextStyle(
-                      color: prodotto.comprato ? Colors.grey : Colors.black87,
+                      color: prodotto.comprato ? AppStyle.coloreTestoSecondario : AppStyle.coloreTestoPrincipale,
                     ),
                   ),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.edit_outlined, color: Colors.grey),
+                        icon: const Icon(Icons.edit_outlined, color: AppStyle.coloreTestoSecondario),
                         onPressed: () {
                           // Passiamo l'oggetto prodotto intero alla schermata, in questo modo i campi di testo saranno già precompilati con i dati vecchi da modificare
                           Navigator.push(
@@ -278,7 +280,7 @@ class _ListaSpesaViewState extends State<ListaSpesaView> {
                         },
                       ),
                       IconButton(
-                        icon: const Icon(Icons.delete_outline, color: Colors.red),
+                        icon: const Icon(Icons.delete_outline, color: AppStyle.coloreErrore),
                         onPressed: () {
                           viewModel.rimuoviProdotto(prodotto.id);
                         },

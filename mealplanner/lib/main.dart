@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'theme/style.dart';
 import 'viewmodels/dispensa_viewmodel.dart';
 import 'viewmodels/piano_pasti_viewmodel.dart';
 import 'viewmodels/lista_spesa_viewmodel.dart';
@@ -30,20 +31,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Gestione Dispensa',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.grey,
-        scaffoldBackgroundColor: Colors.white,
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Colors.white,
-          elevation: 0,
-          titleTextStyle: TextStyle(
-            color: Colors.black,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-          iconTheme: IconThemeData(color: Colors.black),
-        ),
-      ),
+      theme: AppStyle.temaApp, 
       home: const SchermataPrincipale(),
     );
   }

@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 
 import '../../viewmodels/lista_spesa_viewmodel.dart';
 import '../../models/lista_spesa_model.dart';
+import '../../theme/style.dart';
+
 
 class SchermataAggiuntaSpesa extends StatefulWidget {
   final ListaSpesa? prodotto;
@@ -20,7 +22,6 @@ class _SchermataAggiuntaSpesaState extends State<SchermataAggiuntaSpesa> {
   
   String _unitaSelezionata = 'pezzi';
   final List<String> _unitaMisura = ['g', 'kg', 'ml', 'l', 'pezzi', 'confezioni'];
-
 
   // Metodo per inizializzare i campi di testo se stiamo modificando un prodotto già esistente, altrimenti rimarranno vuoti per l'inserimento di un nuovo prodotto
   @override
@@ -62,16 +63,11 @@ class _SchermataAggiuntaSpesaState extends State<SchermataAggiuntaSpesa> {
     final viewModel = Provider.of<ListaSpesaViewModel>(context, listen: false);
 
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
         // Adattiamo il titolo in base a cosa stiamo facendo
         title: Text(
           widget.prodotto == null ? 'Nuovo prodotto' : 'Modifica prodotto',
-          style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
         ),
-        iconTheme: const IconThemeData(color: Colors.black),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -88,7 +84,7 @@ class _SchermataAggiuntaSpesaState extends State<SchermataAggiuntaSpesa> {
               decoration: InputDecoration(
                 hintText: 'Es. Latte, Uova, Pane...',
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(AppStyle.raggioBottoni),
                 ),
               ),
             ),
@@ -116,7 +112,7 @@ class _SchermataAggiuntaSpesaState extends State<SchermataAggiuntaSpesa> {
                         decoration: InputDecoration(
                           hintText: 'Es. 2, 1.5...',
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(AppStyle.raggioBottoni),
                           ),
                         ),
                       ),
@@ -138,7 +134,7 @@ class _SchermataAggiuntaSpesaState extends State<SchermataAggiuntaSpesa> {
                         value: _unitaSelezionata,
                         decoration: InputDecoration(
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(AppStyle.raggioBottoni),
                           ),
                           contentPadding: const EdgeInsets.symmetric(
                             horizontal: 12,
@@ -169,13 +165,6 @@ class _SchermataAggiuntaSpesaState extends State<SchermataAggiuntaSpesa> {
               width: double.infinity,
               height: 50,
               child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.black,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
                 onPressed: () {
                   String nome = _nomeController.text.trim();
                   
@@ -204,7 +193,6 @@ class _SchermataAggiuntaSpesaState extends State<SchermataAggiuntaSpesa> {
                 },
                 child: Text(
                   widget.prodotto == null ? 'Aggiungi alla lista' : 'Salva modifiche',
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
               ),
             ),

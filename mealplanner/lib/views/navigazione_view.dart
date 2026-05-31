@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+
+import '../theme/style.dart';
+
 import 'dispensa/dispensa_view.dart';
 import 'piano_pasti/piano_pasti_view.dart';
 import 'lista_spesa/lista_spesa_view.dart';
@@ -14,13 +17,11 @@ class SchermataPrincipale extends StatefulWidget {
 class _SchermataPrincipaleState extends State<SchermataPrincipale> {
   int _indiceSelezionato = 1;
 
-  // Corretto: rimosso il 'const' globale prima della lista, che causava l'errore,
-  // e inserito solo sul Center che è effettiva mente una costante.
   final List<Widget> _pagine = [
-    RicetteView(),
-    SchermataDispensa(),
-    PianoPastiView(),
-    ListaSpesaView(),
+    const RicetteView(),
+    const SchermataDispensa(),
+    const PianoPastiView(),
+    const ListaSpesaView(),
     const Center(child: Text('Schermata Statistiche (Da implementare)')),
   ];
 
@@ -30,33 +31,34 @@ class _SchermataPrincipaleState extends State<SchermataPrincipale> {
       body: _pagine[_indiceSelezionato],
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
+        backgroundColor: AppStyle.coloreSfondo,
         currentIndex: _indiceSelezionato,
-        selectedItemColor: Colors.grey.shade800,
-        unselectedItemColor: Colors.grey.shade400,
+        selectedItemColor: AppStyle.colorePrimario, 
+        unselectedItemColor: AppStyle.coloreTestoSecondario, 
         onTap: (int nuovoIndice) {
           setState(() {
             _indiceSelezionato = nuovoIndice;
           });
         },
-        items: const [
+        items: [
           BottomNavigationBarItem(
-            icon: Icon(Icons.restaurant_menu),
+            icon: Icon(_indiceSelezionato == 0 ? Icons.restaurant_menu : Icons.restaurant_menu_outlined),
             label: 'Ricette',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.kitchen),
+            icon: Icon(_indiceSelezionato == 1 ? Icons.kitchen : Icons.kitchen_outlined),
             label: 'Dispensa',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_month),
+            icon: Icon(_indiceSelezionato == 2 ? Icons.calendar_month : Icons.calendar_month_outlined),
             label: 'Piano Pasti',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_cart),
+            icon: Icon(_indiceSelezionato == 3 ? Icons.shopping_cart : Icons.shopping_cart_outlined),
             label: 'Spesa',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.bar_chart),
+            icon: Icon(_indiceSelezionato == 4 ? Icons.bar_chart : Icons.bar_chart_outlined),
             label: 'Statistiche',
           ),
         ],

@@ -5,6 +5,8 @@ import '../../viewmodels/piano_pasti_viewmodel.dart';
 import '../../viewmodels/ricette_viewmodel.dart';
 import '../../models/piano_pasti_model.dart';
 import '../../models/ricette_model.dart';
+import '../../theme/style.dart';
+
 
 // StatefulWidget è necessario perché questa schermata gestisce uno stato locale cioè 
 // le selezioni dell'utente nei menu a tendina (giorno, tipologia, ricetta) cambiano nel tempo
@@ -65,18 +67,21 @@ class _SchermataModificaPianoPastiState
             'Sei sicuro di voler rimuovere la ricetta dal ${widget.pasto!.tipologia} di ${widget.pasto!.giorno}?',
           ),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(AppStyle.raggioCard),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx), // Chiude solo il popup (ctx)
               child: const Text(
                 'Annulla',
-                style: TextStyle(color: Colors.grey),
+                style: TextStyle(color: AppStyle.coloreTestoSecondario),
               ),
             ),
             ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppStyle.coloreErrore,
+                foregroundColor: AppStyle.coloreBianco,
+              ),
               onPressed: () {
                 // Logica di "Cancellazione Morbida":
                 // Costruiamo l'ID univoco della casella (es. "lun_pra" per Lunedì Pranzo)
@@ -96,10 +101,7 @@ class _SchermataModificaPianoPastiState
                 Navigator.pop(ctx);     // Chiude il popup di conferma
                 Navigator.pop(context); // Chiude la schermata di modifica e torna al calendario
               },
-              child: const Text(
-                'Elimina',
-                style: TextStyle(color: Colors.white),
-              ),
+              child: const Text('Elimina'),
             ),
           ],
         );
@@ -131,19 +133,11 @@ class _SchermataModificaPianoPastiState
         widget.pasto == null || widget.pasto!.tipologia.isEmpty;
 
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
         // Titolo in base alla modalità
         title: Text(
           isAggiunta ? 'Aggiungi pasto' : 'Modifica ricetta',
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
-          ),
         ),
-        iconTheme: const IconThemeData(color: Colors.black),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -157,13 +151,13 @@ class _SchermataModificaPianoPastiState
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade100,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.grey.shade300),
+                  color: AppStyle.coloreTestoSecondario.withOpacity(0.05),
+                  borderRadius: BorderRadius.circular(AppStyle.raggioBottoni),
+                  border: Border.all(color: AppStyle.coloreTestoSecondario.withOpacity(0.2)),
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.calendar_today, color: Colors.grey, size: 22),
+                    const Icon(Icons.calendar_today_outlined, color: AppStyle.coloreTestoSecondario, size: 22),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
@@ -190,7 +184,7 @@ class _SchermataModificaPianoPastiState
                 hint: const Text('Seleziona la tipologia'),
                 decoration: InputDecoration(
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(AppStyle.raggioBottoni),
                   ),
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 12,
@@ -218,13 +212,13 @@ class _SchermataModificaPianoPastiState
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade100,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.grey.shade300),
+                  color: AppStyle.coloreTestoSecondario.withOpacity(0.05),
+                  borderRadius: BorderRadius.circular(AppStyle.raggioBottoni),
+                  border: Border.all(color: AppStyle.coloreTestoSecondario.withOpacity(0.2)),
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.info_outline, color: Colors.grey),
+                    const Icon(Icons.info_outline, color: AppStyle.coloreTestoSecondario),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
@@ -253,13 +247,13 @@ class _SchermataModificaPianoPastiState
               hint: const Text('Tocca per scegliere una ricetta...'),
               decoration: InputDecoration(
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(AppStyle.raggioBottoni),
                 ),
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: 12,
                   vertical: 8,
                 ),
-                prefixIcon: const Icon(Icons.restaurant_menu),
+                prefixIcon: const Icon(Icons.restaurant_menu_outlined, color: AppStyle.coloreTestoSecondario),
               ),
               // Popoliamo il menu attingendo direttamente dalla lista fornita dal RicetteViewModel
               items: ricetteDisponibili.map((Ricette ricetta) {
@@ -281,13 +275,6 @@ class _SchermataModificaPianoPastiState
               width: double.infinity,
               height: 50,
               child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.black,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
                 onPressed: () {
                   if (_giornoSelezionato == null ||
                       _tipologiaSelezionata == null) {
@@ -326,10 +313,6 @@ class _SchermataModificaPianoPastiState
                 },
                 child: Text(
                   isAggiunta ? 'Salva nel piano' : 'Salva modifiche',
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
                 ),
               ),
             ),
@@ -346,16 +329,13 @@ class _SchermataModificaPianoPastiState
                 // Correzione: reinseriti i parametri 'icon' e 'label' obbligatori per TextButton.icon
                 child: TextButton.icon(
                   style: TextButton.styleFrom(
-                    foregroundColor: Colors.red,
+                    foregroundColor: AppStyle.coloreErrore,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(AppStyle.raggioBottoni),
                     ),
                   ),
                   icon: const Icon(Icons.delete_outline),
-                  label: const Text(
-                    'Rimuovi pasto',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
+                  label: const Text('Rimuovi pasto'),
                   onPressed: () {
                     // Quando l'utente clicca su "Elimina", mostriamo un popup di conferma 
                     _mostraConfermaEliminazione(context, viewModel);

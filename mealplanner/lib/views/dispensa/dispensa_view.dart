@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../viewmodels/dispensa_viewmodel.dart';
 import '../../models/dispensa_model.dart';
-import 'dispensa_modifica_view.dart'; // Creeremo questa schermata subito dopo
+import 'dispensa_modifica_view.dart'; 
+import '../../theme/style.dart';
+
 
 class SchermataDispensa extends StatefulWidget {
   const SchermataDispensa({super.key});
@@ -32,12 +34,10 @@ class _SchermataDispensaState extends State<SchermataDispensa> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Dispensa', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.white,
-        elevation: 0,
+        title: const Text('Dispensa'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.add, color: Colors.black, size: 28),
+            icon: const Icon(Icons.add_circle_outline),
             onPressed: () {
               // Naviga alla schermata di aggiunta
               Navigator.push(
@@ -60,8 +60,15 @@ class _SchermataDispensaState extends State<SchermataDispensa> {
                   child: TextField(
                     decoration: InputDecoration(
                       hintText: 'Cerca...',
-                      prefixIcon: const Icon(Icons.search),
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                      prefixIcon: const Icon(Icons.search_outlined, color: AppStyle.coloreTestoSecondario),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(AppStyle.raggioBottoni),
+                        borderSide: BorderSide(color: AppStyle.coloreTestoSecondario.withOpacity(0.2)),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(AppStyle.raggioBottoni),
+                        borderSide: BorderSide(color: AppStyle.coloreTestoSecondario.withOpacity(0.2)),
+                      ),
                       contentPadding: const EdgeInsets.symmetric(vertical: 0),
                     ),
                   ),
@@ -72,7 +79,14 @@ class _SchermataDispensaState extends State<SchermataDispensa> {
                   child: DropdownButtonFormField<String>(
                     initialValue: _categoriaSelezionata,
                     decoration: InputDecoration(
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(AppStyle.raggioBottoni),
+                        borderSide: BorderSide(color: AppStyle.coloreTestoSecondario.withOpacity(0.2)),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(AppStyle.raggioBottoni),
+                        borderSide: BorderSide(color: AppStyle.coloreTestoSecondario.withOpacity(0.2)),
+                      ),
                       contentPadding: const EdgeInsets.symmetric(horizontal: 10),
                     ),
                     items: ['Tutte', ...Dispensa.categorie].map((String cat) {
@@ -116,9 +130,16 @@ class _SchermataDispensaState extends State<SchermataDispensa> {
                     itemBuilder: (context, index) {
                       final articolo = articoliFiltrati[index];
 
-                      return Card(
+                      return Container(
                         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: AppStyle.coloreBianco,
+                          borderRadius: BorderRadius.circular(AppStyle.raggioCard),
+                          boxShadow: AppStyle.ombraNuvola,
+                        ),
                         child: ListTile(
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppStyle.raggioCard)),
                           onTap: () {
                             // Cliccando sul prodotto si apre la modifica
                             Navigator.push(
@@ -131,18 +152,21 @@ class _SchermataDispensaState extends State<SchermataDispensa> {
                           leading: Container(
                             width: 50,
                             height: 50,
-                            color: Colors.grey.shade200, // Box grigio del wireframe
-                            child: const Icon(Icons.fastfood, color: Colors.grey),
+                            decoration: BoxDecoration(
+                              color: AppStyle.coloreTestoSecondario.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: const Icon(Icons.fastfood_outlined, color: AppStyle.coloreTestoSecondario),
                           ),
                           title: Text(articolo.nome, style: const TextStyle(fontWeight: FontWeight.bold)),
                           subtitle: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('${articolo.quantita} ${articolo.unita}'),
+                              Text('${articolo.quantita} ${articolo.unita}', style: const TextStyle(color: AppStyle.coloreTestoSecondario)),
                               if (articolo.scadenza != null)
                                 Text(
                                   'Scade: ${articolo.scadenza!.day}/${articolo.scadenza!.month}/${articolo.scadenza!.year}',
-                                  style: const TextStyle(fontSize: 12),
+                                  style: const TextStyle(fontSize: 12, color: AppStyle.coloreTestoSecondario),
                                 ),
                             ],
                           ),
@@ -163,10 +187,13 @@ class _SchermataDispensaState extends State<SchermataDispensa> {
     final selezionato = filtroAttuale == testo;
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
-        backgroundColor: selezionato ? Colors.grey.shade700 : Colors.grey.shade200,
-        foregroundColor: selezionato ? Colors.white : Colors.black,
+        backgroundColor: selezionato ? AppStyle.colorePrimario : AppStyle.coloreBianco,
+        foregroundColor: selezionato ? AppStyle.coloreBianco : AppStyle.coloreTestoPrincipale,
         elevation: 0,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppStyle.raggioBottoni)),
+        side: BorderSide(
+          color: selezionato ? Colors.transparent : AppStyle.coloreTestoSecondario.withOpacity(0.2),
+        ),
       ),
       onPressed: () {
         setState(() {
@@ -180,16 +207,16 @@ class _SchermataDispensaState extends State<SchermataDispensa> {
   // Widget per creare le etichette arrotondate
   Widget _costruisciBadgeStato(Dispensa articolo) {
     String testo = 'OK';
-    Color coloreSfondo = Colors.grey.shade200;
-    Color coloreTesto = Colors.black;
+    Color coloreSfondo = AppStyle.coloreTestoSecondario.withOpacity(0.1);
+    Color coloreTesto = AppStyle.coloreTestoSecondario;
 
     if (articolo.quantita <= 0) {
       testo = 'In esaurimento';
-      coloreSfondo = Colors.red.shade100;
-      coloreTesto = Colors.red.shade700;
+      coloreSfondo = AppStyle.coloreErrore.withOpacity(0.1);
+      coloreTesto = AppStyle.coloreErrore;
     } else if (articolo.statoCritico) {
       testo = 'In scadenza';
-      coloreSfondo = Colors.orange.shade100;
+      coloreSfondo = Colors.orange.withOpacity(0.1);
       coloreTesto = Colors.orange.shade700;
     }
 

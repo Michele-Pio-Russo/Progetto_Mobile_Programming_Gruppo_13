@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 import '../../viewmodels/ricette_viewmodel.dart';
 import '../../viewmodels/piano_pasti_viewmodel.dart';
 import '../../models/ricette_model.dart';
+import '../../theme/style.dart';
+
 
 // Classe di supporto interna per mantenere i controller di ogni singola riga di ingrediente
 class _IngredienteRiga {
@@ -164,18 +166,21 @@ class _RicetteModificaViewState extends State<RicetteModificaView> {
             'Sei sicuro di voler eliminare la ricetta "${widget.ricetta!.titolo}"? L\'operazione non può essere annullata.',
           ),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(AppStyle.raggioCard),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx),
               child: const Text(
                 'Annulla',
-                style: TextStyle(color: Colors.grey),
+                style: TextStyle(color: AppStyle.coloreTestoSecondario),
               ),
             ),
             ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppStyle.coloreErrore,
+                foregroundColor: AppStyle.coloreBianco,
+              ),
               onPressed: () {
                 viewModel.rimuoviRicetta(widget.ricetta!.id);
                 Provider.of<PianoPastiViewModel>(
@@ -185,10 +190,7 @@ class _RicetteModificaViewState extends State<RicetteModificaView> {
                 Navigator.pop(ctx);
                 Navigator.pop(context);
               },
-              child: const Text(
-                'Elimina',
-                style: TextStyle(color: Colors.white),
-              ),
+              child: const Text('Elimina'),
             ),
           ],
         );
@@ -213,7 +215,7 @@ class _RicetteModificaViewState extends State<RicetteModificaView> {
                   'Uscendo perderai tutte le modifiche non salvate. Continuare?',
                 ),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(AppStyle.raggioCard),
                 ),
                 actions: [
                   TextButton(
@@ -222,20 +224,18 @@ class _RicetteModificaViewState extends State<RicetteModificaView> {
                     ), // Annulla e rimane nella schermata di modifica
                     child: const Text(
                       'Annulla',
-                      style: TextStyle(color: Colors.grey),
+                      style: TextStyle(color: AppStyle.coloreTestoSecondario),
                     ),
                   ),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
+                      backgroundColor: AppStyle.coloreErrore,
+                      foregroundColor: AppStyle.coloreBianco,
                     ),
                     onPressed: () => Navigator.of(
                       context,
                     ).pop(true), // Conferma l'uscita dalla schermata
-                    child: const Text(
-                      'Esci senza salvare',
-                      style: TextStyle(color: Colors.white),
-                    ),
+                    child: const Text('Esci senza salvare'),
                   ),
                 ],
               ),
@@ -246,18 +246,11 @@ class _RicetteModificaViewState extends State<RicetteModificaView> {
         appBar: AppBar(
           title: Text(
             eModalitaModifica ? 'Modifica Ricetta' : 'Nuova Ricetta',
-            style: const TextStyle(
-              color: Colors.black,
-              fontWeight: FontWeight.bold,
-            ),
           ),
-          backgroundColor: Colors.white,
-          elevation: 0,
-          iconTheme: const IconThemeData(color: Colors.black),
           actions: [
             if (eModalitaModifica)
               IconButton(
-                icon: const Icon(Icons.delete, color: Colors.red),
+                icon: const Icon(Icons.delete_outline, color: AppStyle.coloreErrore),
                 onPressed: () {
                   _mostraConfermaEliminazione(context, viewModel);
                 },
@@ -323,10 +316,10 @@ class _RicetteModificaViewState extends State<RicetteModificaView> {
                   children: List.generate(5, (index) {
                     return IconButton(
                       icon: Icon(
-                        Icons.local_fire_department,
+                        Icons.local_fire_department_outlined,
                         color: index < _difficoltaSelezionata
                             ? Colors.orange
-                            : Colors.grey.shade300,
+                            : AppStyle.coloreTestoSecondario.withOpacity(0.2),
                         size: 32,
                       ),
                       onPressed: () {
@@ -388,7 +381,7 @@ class _RicetteModificaViewState extends State<RicetteModificaView> {
                             decoration: InputDecoration(
                               hintText: 'Nome (es. Farina)',
                               border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
+                                borderRadius: BorderRadius.circular(AppStyle.raggioBottoni),
                               ),
                               contentPadding: const EdgeInsets.symmetric(
                                 horizontal: 12,
@@ -414,7 +407,7 @@ class _RicetteModificaViewState extends State<RicetteModificaView> {
                             decoration: InputDecoration(
                               hintText: 'Quantità',
                               border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
+                                borderRadius: BorderRadius.circular(AppStyle.raggioBottoni),
                               ),
                               contentPadding: const EdgeInsets.symmetric(
                                 horizontal: 12,
@@ -444,7 +437,7 @@ class _RicetteModificaViewState extends State<RicetteModificaView> {
                             value: riga.unitaMisura,
                             decoration: InputDecoration(
                               border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
+                                borderRadius: BorderRadius.circular(AppStyle.raggioBottoni),
                               ),
                               contentPadding: const EdgeInsets.symmetric(
                                 horizontal: 8,
@@ -488,7 +481,7 @@ class _RicetteModificaViewState extends State<RicetteModificaView> {
                           IconButton(
                             icon: const Icon(
                               Icons.remove_circle_outline,
-                              color: Colors.red,
+                              color: AppStyle.coloreErrore,
                             ),
                             onPressed: () => _rimuoviIngrediente(index),
                           ),
@@ -500,12 +493,15 @@ class _RicetteModificaViewState extends State<RicetteModificaView> {
                   alignment: Alignment.centerRight,
                   child: ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey.shade200,
-                      foregroundColor: Colors.black,
-                      shape: const StadiumBorder(), // Bottone ovale
+                      backgroundColor: AppStyle.coloreTestoSecondario.withOpacity(0.1),
+                      foregroundColor: AppStyle.coloreTestoPrincipale,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(AppStyle.raggioBottoni),
+                      ),
                     ),
                     onPressed: _aggiungiIngrediente,
-                    icon: const Icon(Icons.add),
+                    icon: const Icon(Icons.add_circle_outline),
                     label: const Text('Aggiungi'),
                   ),
                 ),
@@ -516,14 +512,6 @@ class _RicetteModificaViewState extends State<RicetteModificaView> {
                   width: double.infinity,
                   height: 50,
                   child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor:
-                          Colors.black, // Uniformato con piano_pasti
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
                     onPressed: () {
                       // Controlliamo che tutti i campi del form obbligatori (quelli con l'asterisco) siano validati
                       if (_formKey.currentState!.validate()) {
@@ -587,7 +575,7 @@ class _RicetteModificaViewState extends State<RicetteModificaView> {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: Text('Ricetta salvata con successo!'),
-                            backgroundColor: Colors.green,
+                            backgroundColor: AppStyle.colorePrimario,
                           ),
                         );
 
@@ -596,10 +584,6 @@ class _RicetteModificaViewState extends State<RicetteModificaView> {
                     },
                     child: Text(
                       eModalitaModifica ? 'Salva modifiche' : 'Salva ricetta',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
                     ),
                   ),
                 ),

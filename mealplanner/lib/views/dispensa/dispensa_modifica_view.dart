@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../viewmodels/dispensa_viewmodel.dart';
 import '../../models/dispensa_model.dart';
+import '../../theme/style.dart';
+
 
 class SchermataModificaProdotto extends StatefulWidget {
   final Dispensa? articolo; // Se è null siamo in modalità "Aggiungi", altrimenti "Modifica"
@@ -67,16 +69,12 @@ class _SchermataModificaProdottoState extends State<SchermataModificaProdotto> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(eModalitaModifica ? 'Modifica Prodotto' : 'Nuovo Prodotto', 
-            style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.black),
+        title: Text(eModalitaModifica ? 'Modifica Prodotto' : 'Nuovo Prodotto'),
         actions: [
           // Se siamo in modalità modifica, mostriamo il cestino
           if (eModalitaModifica)
             IconButton(
-              icon: const Icon(Icons.delete, color: Colors.red),
+              icon: const Icon(Icons.delete_outline, color: AppStyle.coloreErrore),
               onPressed: () {
                 gestore.rimuoviArticolo(widget.articolo!.id);
                 Navigator.pop(context); // Torna alla lista
@@ -152,7 +150,7 @@ class _SchermataModificaProdottoState extends State<SchermataModificaProdotto> {
                   ),
                   if (_dataScadenzaSelezionata != null)
                     IconButton(
-                      icon: const Icon(Icons.clear, color: Colors.grey),
+                      icon: const Icon(Icons.clear, color: AppStyle.coloreTestoSecondario),
                       onPressed: () => setState(() => _dataScadenzaSelezionata = null),
                     ),
                 ],
@@ -164,11 +162,6 @@ class _SchermataModificaProdottoState extends State<SchermataModificaProdotto> {
                 width: double.infinity,
                 height: 50,
                 child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.grey.shade800,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                  ),
                   onPressed: () {
                     // Controlla che tutti i campi obbligatori (*) siano compilati correttamente
                     if (_formKey.currentState!.validate()) {
@@ -202,7 +195,7 @@ class _SchermataModificaProdottoState extends State<SchermataModificaProdotto> {
                       Navigator.pop(context); // Chiude la schermata e torna alla lista
                     }
                   },
-                  child: const Text('SALVA', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  child: const Text('SALVA'),
                 ),
               ),
             ],
