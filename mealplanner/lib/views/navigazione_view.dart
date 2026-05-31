@@ -16,7 +16,7 @@ class SchermataPrincipale extends StatefulWidget {
 }
 
 class _SchermataPrincipaleState extends State<SchermataPrincipale> {
-  int _indiceSelezionato = 1;
+  int _indiceSelezionato = 0;
 
   final List<Widget> _pagine = [
     const SchermataDispensa(),
@@ -62,7 +62,7 @@ class _SchermataPrincipaleState extends State<SchermataPrincipale> {
                   ? Icons.calendar_month
                   : Icons.calendar_month_outlined,
             ),
-            label: 'Piano',
+            label: 'Piano Pasti',
           ),
           BottomNavigationBarItem(
             icon: Icon(
