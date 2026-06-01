@@ -1,0 +1,67 @@
+' ============================================================
+'  MEAL PLANNER & SMART PANTRY — Diagramma 2
+'  Modulo Gestione Ricette (dettagliato)
+' ============================================================
+
+@startuml UC_Ricette
+left to right direction
+skinparam actorStyle awesome
+skinparam packageStyle rectangle
+skinparam usecase {
+  BackgroundColor LightYellow
+  BorderColor Black
+}
+
+title Ricette
+
+actor "Utente" as U
+
+rectangle "Modulo Gestione Ricette" {
+
+  usecase "Visualizzare elenco ricette" as UCR01
+  usecase "Consultare dettaglio ricetta" as UCR02
+  usecase "Inserire nuova ricetta" as UCR03
+  usecase "Modificare ricetta" as UCR04
+  usecase "Eliminare ricetta" as UCR05
+  usecase "Cercare / filtrare ricette" as UCR06
+  usecase "Annullamento operazione" as UCR07
+  usecase "Gestire ingredienti\ndella ricetta" as UCR_ING 
+  usecase "Validare campi\nobbligatori" as UCR_VAL 
+  usecase "Richiedere conferma\ncancellazione" as UCR_CONF 
+  usecase "Propagare rimozione\nal Piano Pasti" as UCR_PROP 
+  usecase "Filtrare per categoria /\ntempo / difficolta" as UCR_FIL
+}
+
+U -- UCR01
+U -- UCR02
+U -- UCR03
+U -- UCR04
+U -- UCR05
+U -- UCR06
+
+UCR01 ..> UCR02 : <<extend>>\n
+
+UCR03 ..> UCR_VAL : <<include>>
+UCR03 ..> UCR_ING : <<include>>
+UCR04 ..> UCR_ING : <<include>>
+UCR04 ..> UCR_VAL : <<include>>
+UCR05 ..> UCR_CONF : <<include>>
+UCR05 ..> UCR_PROP : <<extend>>
+UCR05 ..> UCR07 : <<extend>>
+UCR06 ..> UCR_FIL : <<extend>>
+UCR04 ..> UCR07 : <<extend>>
+UCR03 ..> UCR07 : <<extend>>
+note right of UCR03
+  Campi obbligatori:
+  nome, categoria,
+  almeno 1 ingrediente.
+  Sistema conferma salvataggio.
+end note
+
+note right of UCR05
+  La rimozione propaga
+  l'eliminazione dei riferimenti
+  alla ricetta nel Piano Pasti.
+end note
+
+@enduml

@@ -1,0 +1,51 @@
+' ============================================================
+'  MEAL PLANNER & SMART PANTRY — Diagramma 8
+'  Use Case Dettagliato UC-S02 (Sequence Diagram)
+'  Generazione Semi-Automatica Lista della Spesa
+' ============================================================
+
+@startuml UC_S02_Dettagliato
+skinparam actorStyle awesome
+skinparam sequenceMessageAlign center
+
+title UC-S02 — Generazione Semi-Automatica Lista della Spesa\n(Flusso Principale + Alternativo A)
+
+actor "Utente" as U
+participant "Lista Spesa\n(Screen)" as LS
+participant "Sistema\n(Business Logic)" as SYS
+participant "Piano Pasti\n(Repository)" as MP
+participant "Dispensa\n(Repository)" as DIS
+database "Persistenza\nLocale (SQLite)" as DB
+
+U -> LS : Apre sezione Lista della Spesa
+LS -> DB : Carica lista esistente
+DB --> LS : Lista corrente
+LS --> U : Mostra lista corrente
+
+U -> LS : Preme "Genera lista automatica"
+LS -> SYS : richiesta generazione()
+
+SYS -> MP : getRicettePianificate()
+MP -> DB : query meal_plan + recipes
+DB --> MP : lista ricette del piano
+MP --> SYS : ingredienti necessari per pasto
+
+SYS -> DIS : getQuantitaDisponibili(ingredienti)
+DIS -> DB : query pantry_items
+DB --> DIS : prodotti e quantita' in dispensa
+DIS --> SYS : mappa nome -> quantita' disponibile
+
+SYS -> SYS : calcola ingredienti mancanti\n(needed - available > 0)
+
+alt Ingredienti mancanti trovati
+  SYS -> DB : inserisce ingredienti mancanti\nin shopping_list
+  DB --> SYS : ok
+  SYS --> LS : lista aggiornata
+  LS --> U : Mostra lista con nuovi elementi
+  U -> LS : Revisiona e modifica manualmente\nse necessario
+else Nessun ingrediente mancante (Flusso Alt. A)
+  SYS --> LS : messaggio "Tutti gli ingredienti\nsono gia' disponibili in dispensa"
+  LS --> U : Mostra messaggio di conferma\n(nessun elemento aggiunto)
+end
+
+@enduml

@@ -1,0 +1,55 @@
+' ============================================================
+'  MEAL PLANNER & SMART PANTRY — Diagramma 3
+'  Modulo Gestione Dispensa (dettagliato)
+' ============================================================
+
+@startuml UC_Dispensa
+skinparam actorStyle awesome
+skinparam packageStyle rectangle
+skinparam usecase {
+  BackgroundColor LightCyan
+  BorderColor SteelBlue
+}
+
+title Dispensa
+
+actor "Utente" as U
+actor "Sistema" as S
+
+rectangle "Modulo Gestione Dispensa" {
+
+  usecase "Visualizzazione dispensa" as UCD01A
+  usecase "Aggiunta ingrediente" as UCD01B
+  usecase "Modifica ingrediente" as UCD01C
+  usecase "Rimozione ingrediente" as UCD01D
+  usecase "Controllo scadenze" as UCD02
+  usecase "Filtro dispensa per\ncategoria / stato critico" as UCD03
+  usecase "Segnalare ingredienti\nin esaurimento\n" as UCD_IND
+  usecase "Segnalare ingredienti\nvicini alla scadenza\n" as UCD_EXP 
+  usecase "Richiedere conferma\ncancellazione" as UCD_CONF
+  usecase "Validare nome,\nquantita' e unita'\ndi misura" as UCD_VAL 
+}
+
+U -- UCD01A
+U -- UCD01B
+U -- UCD01C
+U -- UCD01D
+U -- UCD02
+U -- UCD03
+
+UCD01A ..> UCD_IND : <<extend>>
+UCD01A ..> UCD_EXP : <<extend>>
+UCD01D ..> UCD_CONF : <<include>>
+UCD01B ..> UCD_VAL : <<include>>
+UCD01C ..> UCD_VAL : <<include>>
+UCD02  ..> UCD_EXP : <<include>>
+UCD03  ..> UCD01A  : <<extend>>
+
+S --> UCD_IND 
+S --> UCD_EXP 
+
+note bottom of UCD_EXP
+  Soglia configurabile
+end note
+
+@enduml

@@ -1,0 +1,64 @@
+' ============================================================
+'  MEAL PLANNER & SMART PANTRY — Diagramma 7
+'  Feature Avanzate
+' ============================================================
+
+@startuml UC_FeatureAvanzate
+left to right direction
+skinparam actorStyle awesome
+skinparam packageStyle rectangle
+skinparam usecase {
+  BackgroundColor MistyRose
+  BorderColor Crimson
+}
+
+title Feature Avanzate
+
+actor "Utente" as U
+actor "Sistema" as S
+
+rectangle "Feature Avanzate" {
+
+  usecase "Generazione automatica\nlista spesa dal\npiano pasti" as FA01
+  usecase "Suggerimento ricette\nda ingredienti\ndisponibili" as FA02
+  usecase "Gestione avanzata\nscadenze dispensa" as FA03
+
+  usecase "Calcolo ingredienti\nmancanti rispetto\nalla dispensa" as FA01_CALC
+  usecase "Calcolo percentuale\ndisponibilita' ingredienti\nper ogni ricetta" as FA02_PERC 
+  usecase "Ordinamento ricette\nper fattibilita'\ndecrescente" as FA02_ORD 
+  usecase "Monitoraggio scadenze\n" as FA03_MON 
+  usecase "Visualizzazione\nbadge /alert in-app\nper ingredienti in scadenza" as FA03_BADGE
+}
+
+U -- FA01
+U -- FA02
+U -- FA03
+
+S -- FA01_CALC 
+S -- FA02_PERC
+S -- FA03_MON
+
+FA01 ..> FA01_CALC : <<include>>
+FA02 ..> FA02_PERC : <<include>>
+FA02 ..> FA02_ORD  : <<include>>
+FA03 ..> FA03_MON  : <<include>>
+FA03 ..> FA03_BADGE: <<extend>>
+
+note bottom of FA02
+  Per ogni ricetta il Sistema
+  calcola la percentuale di
+  ingredienti gia' disponibili
+  in dispensa e suggerisce
+  le ricette ordinando per
+  fattibilita' decrescente.
+end note
+
+note right of FA03
+  Soglie configurabili:
+  es. 3 giorni = urgente,
+  7 giorni = avviso.
+  Segnalazione tramite badge
+  o sezione dedicata.
+end note
+
+@enduml

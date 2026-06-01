@@ -1,0 +1,56 @@
+' ============================================================
+'  MEAL PLANNER & SMART PANTRY — Diagramma 4
+'  Modulo Pianificazione Pasti (dettagliato)
+' ============================================================
+
+@startuml UC_PianoPasti
+left to right direction
+skinparam actorStyle awesome
+skinparam packageStyle rectangle
+skinparam usecase {
+  BackgroundColor LightGreen
+  BorderColor DarkGreen
+}
+
+title Piano pasti
+
+actor "Utente" as U
+
+rectangle "Modulo Pianificazione Pasti" {
+
+  usecase "Visualizzazione piano pasti" as UCM01A
+  usecase "Aggiunta pasto\nal piano" as UCM01B
+  usecase "Modifica pasto\npianificato" as UCM02A
+  usecase "Rimozione pasto\npianificato" as UCM02B
+  usecase "Navigazione al dettaglio\ndella ricetta associata" as UCM03
+  usecase "Selezione tipologia" as UCM_TIP 
+  usecase "Selezione ricetta\ndal ricettario" as UCM_RIC 
+  usecase "Filtro pasti\nper giorno / settimana" as UCM_FIL 
+}
+
+U -- UCM01A
+U -- UCM01B
+U -- UCM02A
+U -- UCM02B
+U -- UCM03
+
+UCM01B ..> UCM_TIP : <<include>>
+UCM01B ..> UCM_RIC : <<include>>
+UCM02A ..> UCM_TIP : <<extend>>
+UCM02A ..> UCM_RIC : <<extend>>
+UCM01A ..> UCM_FIL : <<extend>>
+UCM01A ..> UCM03   : <<extend>>
+
+note right of UCM03
+  accesso rapido
+  alla ricetta con un singolo tap
+  dalla vista piano pasti.
+end note
+
+note bottom of UCM02B
+  La rimozione di un pasto
+  NON elimina la ricetta
+  dal ricettario.
+end note
+
+@enduml

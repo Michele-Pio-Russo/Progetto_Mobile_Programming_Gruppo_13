@@ -1,0 +1,65 @@
+' ============================================================
+'  MEAL PLANNER & SMART PANTRY — Diagramma 6
+'  Modulo Ricerca, Filtri e Statistiche (dettagliato)
+' ============================================================
+
+@startuml UC_Statistiche
+left to right direction
+skinparam actorStyle awesome
+skinparam packageStyle rectangle
+skinparam usecase {
+  BackgroundColor Lavender
+  BorderColor DarkViolet
+}
+
+title Ricerca e sezione statistiche
+
+actor "Utente" as U
+
+rectangle "Modulo Ricerca, Filtri e Statistiche" {
+
+  usecase "Ricerca testuale" as UCRFS01
+  usecase "Filtra ricette per\ncategoria / tempo /\ndifficoltà" as UCRFS02
+  usecase "Filtra dispensa per\ncategoria / stato critico" as UCRFS03
+  usecase "Consulta statistiche\ne riepiloghi" as UCST01
+  usecase "Consulta statistiche\navanzate" as UCST02
+
+  usecase "Ricerca ricette\nper nome" as UCRFS_RN 
+  usecase "Ricerca ingrediente\nin dispensa" as UCRFS_DN 
+  usecase "Mostra numero totale\nricette salvate" as UCST_1 
+  usecase "Mostra numero pasti\npianificati settimana\ncorrente" as UCST_2
+  usecase "Mostra ingredienti\nin scadenza\nimminente e in\n esaurimento " as UCST_3 
+  usecase "Ingredienti piu' usati\nnelle ricette" as UCST_ADV1 
+  usecase "Distribuzione ricette\nper categoria (grafico)" as UCST_ADV2 
+  usecase "Tempo medio di\npreparazione ricette" as UCST_ADV3 
+  usecase "Ingredienti mancanti\nrispetto al piano\npasti corrente" as UCST_ADV4 
+}
+
+U -- UCRFS01
+U -- UCRFS02
+U -- UCRFS03
+U -- UCST01
+U -- UCST02
+
+UCRFS01 ..> UCRFS_RN : <<include>>
+UCRFS01 ..> UCRFS_DN : <<include>>
+
+UCST01 ..> UCST_1 : <<include>>
+UCST01 ..> UCST_2 : <<include>>
+UCST01 ..> UCST_3 : <<include>>
+
+UCST02 ..> UCST_ADV1 : <<include>>
+UCST02 ..> UCST_ADV2 : <<include>>
+UCST02 ..> UCST_ADV3 : <<include>>
+UCST02 ..> UCST_ADV4 : <<include>>
+
+UCST01 ..> UCST02 : <<extend>>
+
+note right of UCRFS01
+  La ricerca testuale
+  deve coprire almeno 2 moduli
+  (es. ricette per nome 
+  e dispensa per nome prodotto).
+end note
+
+@enduml

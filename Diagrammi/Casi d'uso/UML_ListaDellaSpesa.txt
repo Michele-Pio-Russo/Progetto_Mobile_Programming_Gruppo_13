@@ -1,0 +1,73 @@
+' ============================================================
+'  MEAL PLANNER & SMART PANTRY — Diagramma 5
+'  Modulo Lista della Spesa (dettagliato)
+' ============================================================
+
+@startuml UC_ListaSpesa
+left to right direction
+skinparam actorStyle awesome
+skinparam packageStyle rectangle
+skinparam usecase {
+  BackgroundColor LightSalmon
+  BorderColor OrangeRed
+}
+
+title Lista della Spesa
+
+actor "Utente" as U
+actor "Sistema" as S
+
+rectangle "Modulo Lista della Spesa" {
+
+  usecase "Visualizza lista spesa" as UCS01A
+  usecase "Aggiunge articolo\nmanualmente" as UCS01B
+  usecase "Modifica articolo" as UCS01C
+  usecase "Elimina articolo" as UCS01D
+  usecase "Marca articolo\ncome acquistato" as UCS01E
+  usecase "Genera lista\nsemi-automatica" as UCS02
+  usecase "Rimozione articoli\nacquistati" as UCS03
+
+  usecase "Raccoglie ingredienti\ndal piano pasti" as UCS_MP 
+  usecase "Sottrae quantità\ndisponibili in dispensa" as UCS_DIS
+  usecase "Distingue visivamente\nacquistati / da acquistare" as UCS_VIS 
+  usecase "Mostra messaggio\n'Tutto disponibile'\nse nessun ingrediente\nmancante" as UCS_ALT
+}
+
+U -- UCS01A
+U -- UCS01B
+U -- UCS01C
+U -- UCS01D
+U -- UCS01E
+U -- UCS02
+U -- UCS03
+
+S -- UCS_MP  
+S -- UCS_DIS
+
+UCS01A ..> UCS_VIS : <<include>>
+UCS01E ..> UCS_VIS : <<extend>>
+
+UCS02 ..> UCS_MP  : <<include>>
+UCS02 ..> UCS_DIS : <<include>>
+UCS02 ..> UCS_ALT : <<extend>>
+
+
+
+note right of UCS02
+  Flusso Principale:
+  1. Utente preme "Genera lista"
+  2. Sistema raccoglie ingredienti
+     da ricette nel Piano Pasti
+  3. Sottrae quantita' in Dispensa
+  4. Aggiunge alla lista gli
+     ingredienti mancanti
+  5. Utente revisiona e modifica
+end note
+
+note bottom of UCS01E
+  Marcatura con tap su checkbox
+  o swipe — deve essere
+  visivamente evidente.
+end note
+
+@enduml
